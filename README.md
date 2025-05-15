@@ -577,58 +577,64 @@
         // Repertório expandido de frases para respostas simuladas
         const responseRepertoire = {
             greeting: [
-                "Olá!", "Oi!", "E aí!", "Tudo bem?", "Como vai?", "Oi, tudo certo?", "Saudações!", "Fala!", "Opa!"
+                "Olá!", "Oi!", "E aí!", "Tudo bem?", "Como vai?", "Oi, tudo certo?", "Saudações!", "Fala!", "Opa!", "E aí, tudo joia?", "Olá, como posso ajudar?", "Oi, tudo tranquilo por aqui?"
             ],
             howAreYou: [
-                "Estou bem, obrigado por perguntar!", "Tudo tranquilo por aqui.", "Indo bem.", "Estou ótimo!", "Tudo certo por aqui.", "Muito bem, e você?", "Aqui tudo joia!", "Na paz, e você?"
+                "Estou bem, obrigado por perguntar!", "Tudo tranquilo por aqui.", "Indo bem.", "Estou ótimo!", "Tudo certo por aqui.", "Muito bem, e você?", "Aqui tudo joia!", "Na paz, e você?", "Estou ótimo, e você?", "Tudo nos conformes, e com você?", "Bem por aqui, obrigado!"
             ],
             meeting: [
-                "Claro, podemos marcar.", "Que dia e hora seria bom?", "Tenho a tarde livre.", "Confirme o horário.", "Podemos agendar.", "Quando você estaria disponível?", "Vamos combinar algo.", "Que tal amanhã?", "Me diga um horário que funcione para você."
+                "Claro, podemos marcar.", "Que dia e hora seria bom?", "Tenho a tarde livre.", "Confirme o horário.", "Podemos agendar.", "Quando você estaria disponível?", "Vamos combinar algo.", "Que tal amanhã?", "Me diga um horário que funcione para você.", "Podemos alinhar nossas agendas.", "Que dia é melhor para você?", "Estou com alguns horários livres na semana que vem."
             ],
             file: [
-                "Ok, estou aguardando o arquivo!", "Pode enviar o documento.", "Recebi o arquivo, obrigado!", "Certo, vou dar uma olhada no relatório.", "Assim que receber, te aviso.", "Obrigado por enviar o arquivo.", "O arquivo chegou!", "Vou analisar o documento.", "Pode me mandar o anexo."
+                "Ok, estou aguardando o arquivo!", "Pode enviar o documento.", "Recebi o arquivo, obrigado!", "Certo, vou dar uma olhada no relatório.", "Assim que receber, te aviso.", "Obrigado por enviar o arquivo.", "O arquivo chegou!", "Vou analisar o documento.", "Pode me mandar o anexo.", "Recebi o anexo.", "Obrigado pelo documento.", "Vou baixar o arquivo agora."
             ],
             help: [
-                "Posso ajudar!", "Me diga o que precisa.", "Estou aqui para ajudar.", "Qual a questão?", "Em que posso ser útil?", "Pode perguntar!", "Estou à disposição.", "Conta comigo!", "No que posso te dar uma força?"
+                "Posso ajudar!", "Me diga o que precisa.", "Estou aqui para ajudar.", "Qual a questão?", "Em que posso ser útil?", "Pode perguntar!", "Estou à disposição.", "Conta comigo!", "No que posso te dar uma força?", "Qual a sua dúvida?", "Pode me explicar melhor?", "Estou pronto para ajudar."
             ],
             thanks: [
-                "De nada! 😊", "Por nada!", "Disponha!", "Que bom que pude ajudar!", "Imagina!", "Sem problemas!", "Foi um prazer ajudar!", "Qualquer coisa, é só chamar.", "Não há de quê."
+                "De nada! 😊", "Por nada!", "Disponha!", "Que bom que pude ajudar!", "Imagina!", "Sem problemas!", "Foi um prazer ajudar!", "Qualquer coisa, é só chamar.", "Não há de quê.", "Fico feliz em ajudar!", "À vontade!", "Sempre que precisar!"
             ],
             farewell: [
-                "Até logo!", "Tchau, tchau!", "Nos falamos!", "Até a próxima!", "Um abraço!", "Até mais!", "Fui!", "A gente se fala!", "Tenha um bom dia/tarde/noite!"
+                "Até logo!", "Tchau, tchau!", "Nos falamos!", "Até a próxima!", "Um abraço!", "Até mais!", "Fui!", "A gente se fala!", "Tenha um bom dia/tarde/noite!", "Até breve!", "Tchau!", "Vou nessa!"
             ],
             confirmation: [
-                "Ótimo!", "Perfeito!", "Combinado!", "Entendido!", "Certo!", "Concordo!", "Isso!", "Beleza!", "Fechado!", "Confirmado!", "Exato!", "Certamente."
+                "Ótimo!", "Perfeito!", "Combinado!", "Entendido!", "Certo!", "Concordo!", "Isso!", "Beleza!", "Fechado!", "Confirmado!", "Exato!", "Certamente.", "Sem dúvida!", "Com certeza!", "Isso aí!", "Pode apostar!"
             ],
             negation: [
-                "Ah, entendi.", "Sem problemas.", "Ok, talvez na próxima.", "Compreendo.", "Entendido, sem fazer isso então.", "Não será possível.", "Infelizmente, não.", "Que pena."
+                "Ah, entendi.", "Sem problemas.", "Ok, talvez na próxima.", "Compreendo.", "Entendido, sem fazer isso então.", "Não será possível.", "Infelizmente, não.", "Que pena.", "Não dá para fazer isso.", "Não concordo com isso.", "Acho que não é o caso."
             ],
             general: [
-                "Certo.", "Ok.", "Entendi.", "Hmm.", "Interessante.", "Legal!", "Bom saber.", "Pode crer.", "Faz sentido.", "Sim, sim.", "Entendido.", "Ok, prossiga.", "Continuando...", "E então?", "O que mais?"
+                "Certo.", "Ok.", "Entendi.", "Hmm.", "Interessante.", "Legal!", "Bom saber.", "Pode crer.", "Faz sentido.", "Sim, sim.", "Entendido.", "Ok, prossiga.", "Continuando...", "E então?", "O que mais?", "Pensando aqui...", "Deixa eu ver...", "Um momento...", "Estou analisando.", "Processando...", "Aguarde um pouco."
             ],
             question: [
-                "O que você acha?", "Como podemos fazer?", "Alguma ideia?", "E sobre...?", "Você já viu isso?", "Qual o próximo passo?", "Como está indo?", "Alguma novidade?", "O que me diz?", "Qual a sua opinião?", "Tem alguma sugestão?"
+                "O que você acha?", "Como podemos fazer?", "Alguma ideia?", "E sobre...?", "Você já viu isso?", "Qual o próximo passo?", "Como está indo?", "Alguma novidade?", "O que me diz?", "Qual a sua opinião?", "Tem alguma sugestão?", "E agora?", "O que faremos?", "Alguma pista?", "Você sabe algo sobre isso?"
             ],
             availability: [
-                "Estou livre agora.", "Tenho um tempo mais tarde.", "Estou um pouco ocupado no momento.", "Me avise quando estiver pronto.", "Posso falar agora.", "Estou disponível.", "Tenho uns minutos.", "Agora dá.", "Mais tarde fica melhor."
+                "Estou livre agora.", "Tenho um tempo mais tarde.", "Estou um pouco ocupado no momento.", "Me avise quando estiver pronto.", "Posso falar agora.", "Estou disponível.", "Tenho uns minutos.", "Agora dá.", "Mais tarde fica melhor.", "Estou livre para conversar.", "Posso te atender em breve.", "Me chame quando puder."
             ],
             agreement: [
-                "Concordo.", "Isso mesmo.", "Perfeito.", "Sem dúvida.", "Estamos alinhados.", "Exato!", "Pensamos igual.", "Totalmente de acordo.", "É bem por aí."
+                "Concordo.", "Isso mesmo.", "Perfeito.", "Sem dúvida.", "Estamos alinhados.", "Exato!", "Pensamos igual.", "Totalmente de acordo.", "É bem por aí.", "Assino embaixo!", "Concordo plenamente.", "Você tem razão."
             ],
             disagreement: [
-                "Não tenho certeza.", "Talvez não seja a melhor ideia.", "Precisamos pensar melhor.", "Tenho outro ponto de vista.", "Não vejo bem assim.", "Discordo um pouco.", "Não concordo totalmente.", "Podemos discutir isso."
+                "Não tenho certeza.", "Talvez não seja a melhor ideia.", "Precisamos pensar melhor.", "Tenho outro ponto de vista.", "Não vejo bem assim.", "Discordo um pouco.", "Não concordo totalmente.", "Podemos discutir isso.", "Tenho minhas dúvidas.", "Acho que não funciona assim.", "Vamos analisar melhor."
             ],
              emotion_positive: [
-                 "Que bom!", "Fico feliz!", "Excelente!", "Maravilha!", "Que notícia ótima!", "Adorei!"
+                 "Que bom!", "Fico feliz!", "Excelente!", "Maravilha!", "Que notícia ótima!", "Adorei!", "Fantástico!", "Incrível!", "Muito bom!", "Que alívio!"
              ],
              emotion_negative: [
-                 "Que pena.", "Que chato.", "Sinto muito.", "Puxa vida.", "Que complicado."
+                 "Que pena.", "Que chato.", "Sinto muito.", "Puxa vida.", "Que complicado.", "Que notícia ruim.", "Isso é triste.", "Lamento por isso."
              ],
              suggestion: [
-                 "Que tal se fizermos...?", "Podemos tentar...", "Sugiro que...", "Minha ideia é...", "Que acha de...?"
+                 "Que tal se fizermos...?", "Podemos tentar...", "Sugiro que...", "Minha ideia é...", "Que acha de...?", "Uma sugestão seria...", "Podemos considerar...", "Recomendo que...", "Que tal esta abordagem?"
+             ],
+             inquiry: [ // Perguntas gerais
+                 "O que aconteceu?", "Como foi?", "Alguma novidade?", "E aí?", "O que me conta?", "Tudo certo por aí?", "Como estão as coisas?"
+             ],
+             acknowledgement: [ // Reconhecimento simples
+                 "Ah, sim.", "Entendi.", "Ok.", "Certo.", "Compreendo.", "Saquei."
              ],
              random: [ // Frases aleatórias para variar
-                "Que interessante!", "Bom dia/tarde/noite!", "Espero que esteja tudo bem.", "Recebi sua mensagem.", "Estou pensando sobre isso.", "Parece bom.", "Vamos ver.", "Combinado!", "Ok, pode ser.", "Entendido, obrigado!", "Estou por aqui se precisar.", "Tudo certo.", "Sem novidades por aqui.", "Dia corrido.", "Pausa para um café?"
+                "Que interessante!", "Bom dia/tarde/noite!", "Espero que esteja tudo bem.", "Recebi sua mensagem.", "Estou pensando sobre isso.", "Parece bom.", "Vamos ver.", "Combinado!", "Ok, pode ser.", "Entendido, obrigado!", "Estou por aqui se precisar.", "Tudo certo.", "Sem novidades por aqui.", "Dia corrido.", "Pausa para um café?", "Como está o tempo por aí?", "Algum plano para o fim de semana?", "Notícias?", "Novidades?"
              ]
         };
 
@@ -725,9 +731,14 @@
 
             } catch (e) {
                 console.error("Erro ao carregar estado do localStorage:", e);
-                 // Em caso de erro ao carregar, usa os dados iniciais como fallback
+                 // Em caso de erro fatal ao carregar, usa os dados iniciais como fallback
                  simulatedBackend = JSON.parse(JSON.stringify(initialSimulatedBackendData)); // Cria uma cópia profunda
                  console.log("Usando dados iniciais devido a erro de carregamento.");
+                 // Garante que a tela de cadastro seja mostrada em caso de erro de carregamento
+                 showRegistrationScreen();
+                 registrationErrorMessageEl.textContent = "Ocorreu um erro ao carregar os dados. Por favor, tente novamente ou limpe o armazenamento local.";
+                 registrationErrorMessageEl.style.display = 'block';
+                 return; // Sai da função para não continuar a inicialização com dados inconsistentes
             }
              // Garante que allContacts reflita simulatedBackend.contacts após carregar
              allContacts = [...simulatedBackend.contacts];
@@ -780,7 +791,7 @@
                         // --- Lógica para gerar resposta contextual (SIMULADA) ---
                         const lowerText = text.toLowerCase();
                         let selectedPhrases = [];
-                        let basePhraseAdded = false; // Flag para garantir pelo menos uma frase base
+                        let mainTopicFound = false; // Flag para verificar se um tópico principal foi abordado
 
                         // Função auxiliar para adicionar uma frase de uma categoria com chance
                         const addPhrase = (category, chance = 1.0) => {
@@ -795,109 +806,109 @@
                         };
 
                         // Lógica de seleção e combinação de frases com base em palavras-chave
-                        if (lowerText.includes('olá') || lowerText.includes('oi') || lowerText.includes('tudo bem')) {
-                            addPhrase('greeting', 1.0); // Sempre adiciona uma saudação
-                            addPhrase('howAreYou', 0.7); // Chance de adicionar como está
-                             basePhraseAdded = true;
-                        }
-
+                        // Prioriza tópicos principais
                         if (lowerText.includes('marcar') || lowerText.includes('reunião') || lowerText.includes('café') || lowerText.includes('encontrar')) {
-                            addPhrase('meeting', 1.0); // Sempre adiciona algo sobre marcar
-                            addPhrase('availability', 0.6); // Chance de adicionar algo sobre disponibilidade
-                             addPhrase('question', 0.5); // Chance de adicionar uma pergunta relacionada
-                             basePhraseAdded = true;
+                            addPhrase('meeting', 1.0);
+                            addPhrase('availability', 0.7);
+                            addPhrase('question', 0.6);
+                            mainTopicFound = true;
                         }
 
                         if (lowerText.includes('arquivo') || lowerText.includes('documento') || lowerText.includes('relatório') || lowerText.includes('anexo')) {
-                             addPhrase('file', 1.0); // Sempre adiciona algo sobre arquivo
-                             addPhrase('confirmation', 0.5); // Chance de confirmar
-                             basePhraseAdded = true;
+                             addPhrase('file', 1.0);
+                             addPhrase('confirmation', 0.6);
+                             mainTopicFound = true;
                         }
 
                         if (lowerText.includes('ajuda') || lowerText.includes('dúvida') || lowerText.includes('questão') || lowerText.includes('problema')) {
-                             addPhrase('help', 1.0); // Sempre adiciona algo sobre ajuda
-                             addPhrase('question', 0.7); // Alta chance de adicionar uma pergunta
-                             basePhraseAdded = true;
+                             addPhrase('help', 1.0);
+                             addPhrase('question', 0.8);
+                             mainTopicFound = true;
                         }
 
+                         if (lowerText.includes('sugere') || lowerText.includes('proposta') || lowerText.includes('ideia')) {
+                             addPhrase('suggestion', 1.0);
+                             addPhrase('question', 0.5);
+                             mainTopicFound = true;
+                         }
+
+
+                         // Lógica para respostas mais gerais e combinações secundárias
+                         if (lowerText.includes('olá') || lowerText.includes('oi') || lowerText.includes('tudo bem') || lowerText.includes('como você está')) {
+                             addPhrase('greeting', mainTopicFound ? 0.3 : 1.0); // Alta chance se não for tópico principal
+                             addPhrase('howAreYou', mainTopicFound ? 0.4 : 0.8); // Alta chance se não for tópico principal
+                             if (!mainTopicFound) addPhrase('question', 0.4); // Adiciona pergunta se for apenas saudação
+                         }
+
                         if (lowerText.includes('obrigado') || lowerText.includes('valeu') || lowerText.includes('agradeço')) {
-                             addPhrase('thanks', 1.0); // Sempre adiciona um agradecimento
-                             addPhrase('farewell', 0.3); // Pequena chance de despedida
-                             basePhraseAdded = true;
+                             addPhrase('thanks', 1.0);
+                             addPhrase('farewell', 0.4);
                         }
 
                         if (lowerText.includes('até mais') || lowerText.includes('tchau') || lowerText.includes('falou') || lowerText.includes('abraço')) {
-                             addPhrase('farewell', 1.0); // Sempre adiciona uma despedida
-                             addPhrase('thanks', 0.2); // Pequena chance de agradecer de volta
-                             basePhraseAdded = true;
+                             addPhrase('farewell', 1.0);
+                             addPhrase('thanks', 0.3);
                         }
-
-                        if (lowerText.includes('como você está') || lowerText.includes('tudo bem com você')) {
-                             addPhrase('howAreYou', 1.0); // Sempre responde como está
-                             addPhrase('question', 0.5); // Chance de perguntar de volta
-                             basePhraseAdded = true;
-                        }
-
-                         if (lowerText.includes('o que você faz')) {
-                             replyText = `Sou um contato simulado neste aplicativo. 😊 Posso responder a algumas frases comuns!`;
-                             selectedPhrases = [replyText]; // Substitui as frases selecionadas
-                             basePhraseAdded = true;
-                         }
 
                         if (lowerText.includes('sim') || lowerText.includes('ok') || lowerText.includes('certo') || lowerText.includes('beleza')) {
-                             addPhrase('confirmation', 1.0); // Sempre confirma
-                             addPhrase('general', 0.4); // Chance de adicionar uma frase geral
-                             basePhraseAdded = true;
+                             addPhrase('confirmation', 1.0);
+                             addPhrase('general', 0.5);
+                             addPhrase('acknowledgement', 0.4);
                         }
 
                         if (lowerText.includes('não')) {
-                             addPhrase('negation', 1.0); // Sempre nega/compreende
-                             addPhrase('general', 0.3); // Chance de adicionar uma frase geral
-                             basePhraseAdded = true;
+                             addPhrase('negation', 1.0);
+                             addPhrase('general', 0.4);
+                             addPhrase('acknowledgement', 0.5);
                         }
 
                          if (lowerText.includes('feliz') || lowerText.includes('ótimo') || lowerText.includes('bom')) {
-                             addPhrase('emotion_positive', 0.8); // Alta chance de resposta positiva
-                             addPhrase('general', 0.3);
-                             basePhraseAdded = true;
+                             addPhrase('emotion_positive', 1.0);
+                             addPhrase('general', 0.4);
                          }
 
                          if (lowerText.includes('triste') || lowerText.includes('chateado') || lowerText.includes('ruim')) {
-                             addPhrase('emotion_negative', 0.8); // Alta chance de resposta negativa
-                             addPhrase('general', 0.3);
-                             basePhraseAdded = true;
+                             addPhrase('emotion_negative', 1.0);
+                             addPhrase('general', 0.4);
                          }
 
-                         if (lowerText.includes('sugere') || lowerText.includes('proposta') || lowerText.includes('ideia')) {
-                             addPhrase('suggestion', 0.8); // Alta chance de sugerir algo
-                             addPhrase('question', 0.4);
-                             basePhraseAdded = true;
+                         if (lowerText.includes('o que você faz')) {
+                             replyText = `Sou um contato simulado neste aplicativo. 😊 Posso responder a algumas frases comuns e simular interações básicas!`;
+                             selectedPhrases = [replyText]; // Substitui as frases selecionadas
                          }
 
 
-                        // Se nenhuma palavra-chave específica foi encontrada ou a resposta base não foi adicionada, use uma resposta geral ou aleatória
-                        if (!basePhraseAdded || selectedPhrases.length === 0) {
-                             if (lowerText.length > 10 && Math.random() < 0.7) { // Maior chance de resposta geral para mensagens mais longas
+                        // Se nenhuma frase foi adicionada por palavras-chave específicas, adicione frases gerais ou aleatórias
+                        if (selectedPhrases.length === 0) {
+                             if (lowerText.length > 10 && Math.random() < 0.8) { // Maior chance de resposta geral para mensagens mais longas
                                  addPhrase('general', 1.0);
-                                 if (Math.random() < 0.4) { // Chance de adicionar uma pergunta
+                                 if (Math.random() < 0.5) { // Chance de adicionar uma pergunta
                                       addPhrase('question', 1.0);
                                  }
-                             } else { // Para mensagens curtas ou sem match, use uma confirmação ou aleatória
-                                 const fallbackOptions = [...responseRepertoire.confirmation, ...responseRepertoire.random];
-                                 selectedPhrases.push(fallbackOptions[Math.floor(Math.random() * fallbackOptions.length)]);
+                             } else { // Para mensagens curtas ou sem match, use uma confirmação, reconhecimento ou aleatória
+                                 const fallbackOptions = [...responseRepertoire.confirmation, ...responseRepertoire.acknowledgement, ...responseRepertoire.random];
+                                 // Adiciona 1 a 2 frases de fallback
+                                 addPhrase(fallbackOptions[Math.floor(Math.random() * fallbackOptions.length)], 1.0);
+                                 addPhrase(fallbackOptions[Math.floor(Math.random() * fallbackOptions.length)], 0.5);
                              }
                         }
 
                         // Junta as frases selecionadas para formar a resposta final
                          // Embaralha as frases para variar a ordem
                          selectedPhrases.sort(() => Math.random() - 0.5);
-                         replyText = selectedPhrases.join(' '); // Junta com um espaço
+                         replyText = selectedPhrases.join(' ').replace(/\s+/g, ' ').trim(); // Junta, remove múltiplos espaços e espaços no início/fim
+
+                         // Adiciona pontuação final se a última frase não tiver
+                         if (replyText.length > 0 && !/[.!?]$/.test(replyText)) {
+                             replyText += '.';
+                         }
+
 
                         // --- Fim da Lógica de Resposta ---
 
                          replyMessage = {
                             senderId: contactId,
-                            text: replyText.trim(), // Remove espaços extras no início/fim
+                            text: replyText,
                             time: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
                             type: 'received'
                         };
@@ -911,7 +922,7 @@
                     // Resolve com a mensagem enviada e a resposta simulada (se houver)
                     resolve({ sent: newMessage, received: replyMessage });
 
-                }, 200 + Math.random() * 300); // Simula um atraso para envio e resposta (levemente maior)
+                }, 200 + Math.random() * 400); // Simula um atraso para envio e resposta (levemente maior)
             });
         }
 
