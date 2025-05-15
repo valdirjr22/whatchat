@@ -538,11 +538,7 @@
                 { id: 3, fullName: 'Carla Dias', name: 'Carla', phone: '31987654321', email: 'carla@example.com', avatar: 'https://placehold.co/100x100/A9F7C0/4F4F4F?text=CD', online: true },
                 { id: 4, fullName: 'Daniel Alves', name: 'Daniel', phone: '41987654321', email: 'daniel@example.com', avatar: 'https://placehold.co/100x100/F7A9A9/4F4F4F?text=DA', online: false },
                 { id: 5, fullName: 'Eduarda Lima', name: 'Eduarda', phone: '51987654321', email: 'eduarda@example.com', avatar: 'https://placehold.co/100x100/D8A9F7/4F4F4F?text=EL', online: true },
-                 // Novos usuários potenciais
-                { id: 6, fullName: 'Fernando Rocha', name: 'Fernando', phone: '61987654321', email: 'fernando@example.com', avatar: 'https://placehold.co/100x100/FFD700/4F4F4F?text=FR', online: true },
-                { id: 7, fullName: 'Juliana Gomes', name: 'Juliana', phone: '71987654321', email: 'juliana@example.com', avatar: 'https://placehold.co/100x100/98FB98/4F4F4F?text=JG', online: false },
-                { id: 8, fullName: 'Gustavo Pereira', name: 'Gustavo', phone: '81987654321', email: 'gustavo@example.com', avatar: 'https://placehold.co/100x100/ADD8E6/4F4F4F?text=GP', online: true },
-                 { id: 9, fullName: 'Heloísa Fernandes', name: 'Heloísa', phone: '91987654321', email: 'heloisa@example.com', avatar: 'https://placehold.co/100x100/EE82EE/4F4F4F?text=HF', online: false },
+                 // Novos usuários potenciais (serão adicionados aqui após o cadastro)
             ],
              // Mensagens associadas aos IDs de usuário (simuladas)
             messages: {
@@ -568,10 +564,7 @@
                 ],
                 5: [], // Chat vazio
                  // Chats para novos contatos (inicialmente vazios ou com mensagem de boas-vindas)
-                6: [{ senderId: 6, text: 'Olá! Fui adicionado via link!', time: 'Agora', type: 'received' }],
-                7: [],
-                8: [{ senderId: 8, text: 'Oi! Tudo bem?', time: 'Agora', type: 'received' }],
-                9: [],
+                // IDs 6, 7, 8, 9 são apenas exemplos iniciais, novos IDs serão gerados
             }
         };
 
@@ -581,6 +574,8 @@
         // Chaves para o localStorage
         const LOCAL_STORAGE_CONTACTS_KEY = 'messagingAppSimContacts'; // Chave para contatos
         const LOCAL_STORAGE_USER_KEY = 'messagingAppCurrentUser'; // Chave para o usuário atual
+        const LOCAL_STORAGE_ALL_USERS_KEY = 'messagingAppAllUsers'; // Chave para todos os usuários
+
 
         // Variável temporária para armazenar o ID do usuário que convidou (ao abrir o link de convite)
         let invitingUserIdOnLoad = null;
@@ -591,14 +586,16 @@
         // Salva o estado atual no localStorage
         function saveStateToLocalStorage() {
             try {
-                // Salva apenas os contatos e o usuário atual
+                // Salva contatos e o usuário atual
                 localStorage.setItem(LOCAL_STORAGE_CONTACTS_KEY, JSON.stringify(simulatedBackend.contacts));
-
                  if (simulatedBackend.currentUser) {
                      localStorage.setItem(LOCAL_STORAGE_USER_KEY, JSON.stringify(simulatedBackend.currentUser));
                  } else {
-                     localStorage.removeItem(LOCAL_STORAGE_USER_KEY); // Remove se o usuário não estiver logado
+                     localStorage.removeItem(LOCAL_STORAGE_USER_KEY);
                  }
+
+                 // Salva a lista completa de usuários
+                 localStorage.setItem(LOCAL_STORAGE_ALL_USERS_KEY, JSON.stringify(simulatedBackend.allPotentialUsers));
 
                 console.log("Estado salvo no localStorage.");
             } catch (e) {
@@ -611,9 +608,21 @@
             try {
                 const savedContacts = localStorage.getItem(LOCAL_STORAGE_CONTACTS_KEY);
                 const savedUser = localStorage.getItem(LOCAL_STORAGE_USER_KEY);
+                 const savedAllUsers = localStorage.getItem(LOCAL_STORAGE_ALL_USERS_KEY);
+
 
                 // Carrega dados iniciais como base
                 simulatedBackend = JSON.parse(JSON.stringify(initialSimulatedBackendData)); // Cria uma cópia profunda
+
+                 // Tenta carregar a lista completa de usuários do localStorage
+                 if (savedAllUsers) {
+                     simulatedBackend.allPotentialUsers = JSON.parse(savedAllUsers);
+                     console.log("Lista de todos os usuários carregada do localStorage.");
+                 } else {
+                     console.log("Nenhuma lista de todos os usuários salva encontrada. Usando dados iniciais.");
+                     // Se não encontrar, usa a lista inicial (que já está em simulatedBackend)
+                 }
+
 
                 if (savedContacts) {
                     const parsedContacts = JSON.parse(savedContacts);
@@ -632,9 +641,8 @@
                      console.log("Nenhum usuário salvo encontrado.");
                  }
 
-                 // Mensagens e lista de potenciais sempre vêm dos dados iniciais nesta simulação
+                 // Mensagens sempre vêm dos dados iniciais nesta simulação (não persistem)
                  simulatedBackend.messages = initialSimulatedBackendData.messages;
-                 simulatedBackend.allPotentialUsers = initialSimulatedBackendData.allPotentialUsers;
 
 
             } catch (e) {
@@ -1115,7 +1123,7 @@
             const chatIdFromUrl = params.get('chatId');
             const inviteUserIdFromUrl = params.get('inviteUserId'); // Novo parâmetro para convite de usuário
 
-            // Carrega o estado do localStorage (incluindo o usuário e contatos)
+            // Carrega o estado do localStorage (incluindo o usuário, contatos e ALL USERS)
             loadStateFromLocalStorage();
 
             // Verifica se o usuário já está cadastrado
@@ -1125,7 +1133,7 @@
                 updateUserStatusIndicator(); // Atualiza o indicador de status do usuário
 
                 // --- Lógica para adicionar novos contatos ao usuário logado ---
-                // Itera sobre todos os usuários potenciais
+                // Itera sobre todos os usuários potenciais (carregados do localStorage)
                 simulatedBackend.allPotentialUsers.forEach(potentialUser => {
                      // Verifica se não é o usuário logado E se não está já na lista de contatos
                     const isCurrentUser = simulatedBackend.currentUser && potentialUser.id === simulatedBackend.currentUser.id;
@@ -1144,7 +1152,7 @@
                          };
                          simulatedBackend.contacts.push(newContact);
                          allContacts.push(newContact); // Mantém a lista local sincronizada
-                         console.log(`Novo usuário ${potentialUser.name} adicionado aos contatos do usuário logado.`);
+                         console.log(`Novo usuário ${potentialUser.name} (ID: ${potentialUser.id}) adicionado aos contatos do usuário logado (ID: ${simulatedBackend.currentUser.id}).`);
                     }
                 });
                 // Salva a lista de contatos atualizada (com os novos) no localStorage
@@ -1302,8 +1310,6 @@
             }
 
             // Simula a criação de um novo usuário com um ID único (baseado no timestamp para simulação)
-            // Usamos um ID baseado no timestamp + um número aleatório para tentar evitar colisões
-            // em testes rápidos, embora em um sistema real um backend geraria IDs únicos.
             const newUserId = Date.now() + Math.floor(Math.random() * 1000);
 
             const newUser = {
@@ -1337,7 +1343,7 @@
                      };
                      simulatedBackend.contacts.push(newContact);
                      // allContacts será atualizado antes de renderizar
-                     console.log(`Usuário ${invitingUser.name} (ID: ${invitingUserId}) adicionado aos contatos do novo usuário (ID: ${newUserId}).`);
+                     console.log(`Usuário ${invulatingUser.name} (ID: ${invitingUserId}) adicionado aos contatos do novo usuário (ID: ${newUserId}).`);
 
                      // Em um sistema real, aqui o backend também adicionaria o novo usuário
                      // à lista de contatos do convidante. Nesta simulação, a lógica
@@ -1358,7 +1364,7 @@
              console.log(`Novo usuário (ID: ${newUserId}) adicionado à lista de allPotentialUsers.`);
 
 
-            saveStateToLocalStorage(); // Salva o novo usuário e a lista de contatos (potencialmente com o convidante)
+            saveStateToLocalStorage(); // Salva o novo usuário, a lista de contatos (potencialmente com o convidante) e a lista global de usuários
 
             showMessageBox("Cadastro realizado com sucesso!");
 
