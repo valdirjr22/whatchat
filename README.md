@@ -1,0 +1,1350 @@
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>App de Mensagens</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Estilos básicos para o corpo e container principal */
+        body {
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f0f2f5; /* Cor de fundo suave */
+            margin: 0; /* Remove margem padrão do body */
+            overflow: hidden; /* Evita scroll no body */
+        }
+        .chat-container {
+            display: flex;
+            height: 90vh; /* Altura ajustada */
+            max-height: 800px; /* Altura máxima */
+            width: 100%;
+            max-width: 1200px; /* Largura máxima aumentada */
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2); /* Sombra mais proeminente */
+            border-radius: 16px; /* Bordas mais arredondadas */
+            overflow: hidden; /* Para manter as bordas arredondadas nos filhos */
+            background-color: #fff; /* Fundo branco para o container */
+             /* Adiciona um gradiente sutil ou textura de fundo */
+            background-image: linear-gradient(to bottom right, #ffffff, #f9f9f9);
+        }
+        /* Estilos para a barra lateral */
+        .sidebar {
+            width: 35%; /* Largura da barra lateral */
+            max-width: 350px; /* Largura máxima da barra lateral aumentada */
+            background-color: #f8f9fa; /* Cor de fundo da barra lateral */
+            border-right: 1px solid #e0e0e0; /* Divisor */
+            display: flex;
+            flex-direction: column;
+            /* Responsividade: em telas pequenas, a barra lateral pode ocupar 100% da largura */
+            @media (max-width: 768px) {
+                width: 100%;
+                max-width: none;
+                height: 100%; /* Ocupa a altura total em mobile */
+                position: absolute; /* Posiciona absolutamente para esconder/mostrar */
+                left: 0;
+                top: 0;
+                z-index: 20; /* Garante que fique por cima do modal */
+                transform: translateX(-100%); /* Animação */
+            }
+        }
+        .sidebar.open {
+             transform: translateX(0); /* Mostra a barra lateral em mobile */
+        }
+        /* Estilos para a área de chat */
+        .chat-area {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: #ffffff; /* Fundo da área de chat */
+             /* Responsividade: em telas pequenas, a área de chat fica escondida por padrão */
+            @media (max-width: 768px) {
+                width: 100%; /* Ocupa a largura total em mobile */
+                display: none; /* Esconde por padrão em mobile */
+            }
+        }
+         .chat-area.active {
+             /* Mostra a área de chat em mobile quando ativa */
+             @media (max-width: 768px) {
+                display: flex;
+             }
+         }
+        /* Estilo para o item de contato ativo na lista */
+        .contact.active {
+            background-color: #e0e7ff; /* Destaque para contato ativo */
+            border-left: 4px solid #3b82f6; /* Adiciona uma barra colorida */
+            padding-left: calc(1rem - 4px); /* Ajusta o padding para compensar a borda */
+        }
+         .contact:hover {
+             background-color: #f1f1f1; /* Fundo levemente mais escuro no hover */
+         }
+        /* Estilos para as bolhas de mensagem */
+        .message-bubble {
+            padding: 10px 15px;
+            border-radius: 20px; /* Bolhas de mensagem mais arredondadas */
+            max-width: 70%;
+            word-wrap: break-word;
+            filter: drop-shadow(0 1px 0.5px rgba(0,0,0,0.1)); /* Sombra sutil */
+            transition: transform 0.2s ease-in-out; /* Animação ao aparecer */
+        }
+        .message-bubble.sent {
+            background-color: #3b82f6; /* Azul para mensagens enviadas */
+            color: white;
+            align-self: flex-end;
+            /* Adiciona um "bico" na bolha enviada */
+            border-bottom-right-radius: 2px;
+        }
+        .message-bubble.received {
+            background-color: #e5e7eb; /* Cinza claro para mensagens recebidas */
+            color: #1f2937; /* Texto escuro para contraste */
+            align-self: flex-start;
+            /* Adiciona um "bico" na bolha recebida */
+            border-bottom-left-radius: 2px;
+        }
+        /* Estilos para a área de input de chat */
+        .chat-input input {
+            border-radius: 20px; /* Input mais arredondado */
+            padding-left: 20px;
+            padding-right: 20px;
+             transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .chat-input button {
+            border-radius: 50%; /* Botão de enviar circular */
+             transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
+        }
+         .chat-input button:hover:not(:disabled) {
+             transform: scale(1.05); /* Efeito sutil no hover */
+         }
+        /* Estilo para o campo de busca com ícone */
+        .search-input-container {
+            position: relative;
+        }
+        .search-input-container input {
+            padding-left: 2.5rem; /* Espaço para o ícone */
+        }
+        .search-input-container .search-icon {
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af; /* Cor do ícone de busca */
+            pointer-events: none; /* Garante que o clique passe para o input */
+        }
+         /* Estilo para os botões de ícone no cabeçalho */
+        .chat-header button {
+             transition: color 0.2s ease-in-out;
+        }
+         .chat-header button:hover {
+             color: #3b82f6; /* Cor azul no hover */
+         }
+         /* Estilo para o botão de voltar em mobile */
+        .back-button {
+            display: none; /* Esconde por padrão */
+            @media (max-width: 768px) {
+                display: block; /* Mostra em mobile */
+            }
+        }
+        /* Scrollbar customizada */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #c5c5c5;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a5a5a5;
+        }
+         /* Estilo para a mensagem de "nenhum contato encontrado" */
+        #no-contacts-found {
+            text-align: center;
+            color: #6b7280; /* Cor cinza */
+            padding: 20px;
+            font-size: 0.9rem;
+        }
+
+        /* --- Estilos para o Modal de Perfil/Configurações --- */
+        .settings-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5); /* Fundo semi-transparente */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 30; /* Acima de tudo */
+            visibility: hidden; /* Escondido por padrão */
+            opacity: 0; /* Transparência inicial */
+            transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+        }
+        .settings-modal-overlay.visible {
+            visibility: visible;
+            opacity: 1;
+        }
+        .settings-modal {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            width: 90%;
+            max-width: 500px; /* Largura máxima do modal */
+            transform: translateY(-20px); /* Começa um pouco acima */
+            transition: transform 0.3s ease-in-out;
+        }
+         .settings-modal-overlay.visible .settings-modal {
+             transform: translateY(0); /* Desliza para a posição final */
+         }
+        .settings-modal h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #1f2937;
+        }
+        .settings-modal label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #374151;
+        }
+         .settings-modal .form-group {
+             margin-bottom: 20px;
+         }
+        .settings-modal input[type="text"],
+        .settings-modal input[type="email"],
+        .settings-modal input[type="tel"],
+        .settings-modal select { /* Adicionado select para status */
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 1rem;
+             transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+         .settings-modal input[type="text"]:focus,
+         .settings-modal input[type="email"]:focus,
+         .settings-modal input[type="tel"]:focus,
+         .settings-modal select:focus {
+             outline: none;
+             border-color: #3b82f6;
+             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+         }
+        .settings-modal .button-group {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px; /* Espaço entre os botões */
+            margin-top: 30px; /* Espaço acima dos botões */
+        }
+        .settings-modal button {
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+             transition: background-color 0.2s ease-in-out, opacity 0.2s ease-in-out;
+        }
+        .settings-modal button.save-button {
+            background-color: #3b82f6;
+            color: white;
+        }
+        .settings-modal button.save-button:hover {
+            background-color: #2563eb;
+        }
+        .settings-modal button.cancel-button {
+            background-color: #e5e7eb;
+            color: #1f2937;
+        }
+         .settings-modal button.cancel-button:hover {
+             background-color: #d1d5db;
+         }
+
+         /* --- Estilos para a Tela de Cadastro --- */
+         .registration-screen {
+             position: fixed;
+             top: 0;
+             left: 0;
+             width: 100%;
+             height: 100%;
+             background-color: #f0f2f5; /* Mesma cor de fundo do body */
+             display: flex;
+             justify-content: center;
+             align-items: center;
+             z-index: 40; /* Acima de tudo, incluindo modais */
+             visibility: hidden; /* Escondido por padrão */
+             opacity: 0; /* Transparência inicial */
+             transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+         }
+         .registration-screen.visible {
+             visibility: visible;
+             opacity: 1;
+         }
+         .registration-form {
+             background-color: #fff;
+             padding: 40px;
+             border-radius: 12px;
+             box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+             width: 90%;
+             max-width: 400px; /* Largura máxima do formulário */
+             text-align: center;
+         }
+         .registration-form h2 {
+             font-size: 1.8rem;
+             font-weight: 700;
+             margin-bottom: 30px;
+             color: #1f2937;
+         }
+         .registration-form label {
+             display: block;
+             margin-bottom: 8px;
+             font-weight: 500;
+             color: #374151;
+             text-align: left;
+         }
+         .registration-form input[type="text"],
+         .registration-form input[type="email"],
+         .registration-form input[type="tel"] {
+             width: 100%;
+             padding: 12px;
+             border: 1px solid #d1d5db;
+             border-radius: 8px;
+             margin-bottom: 20px;
+             font-size: 1rem;
+              transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+         }
+          .registration-form input[type="text"]:focus,
+          .registration-form input[type="email"]:focus,
+          .registration-form input[type="tel"]:focus {
+              outline: none;
+              border-color: #3b82f6;
+              box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+          }
+         .registration-form button {
+             width: 100%;
+             padding: 12px;
+             background-color: #3b82f6;
+             color: white;
+             border-radius: 8px;
+             font-size: 1.1rem;
+             font-weight: 600;
+             cursor: pointer;
+              transition: background-color 0.2s ease-in-out;
+         }
+         .registration-form button:hover {
+             background-color: #2563eb;
+         }
+         .error-message {
+             color: #dc2626; /* Cor vermelha para erro */
+             font-size: 0.9rem;
+             margin-top: -10px;
+             margin-bottom: 15px;
+             text-align: left;
+             display: none; /* Escondido por padrão */
+         }
+
+         /* Estilos para o indicador de status do usuário no header da sidebar */
+        .user-status-indicator {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            display: block;
+            height: 10px; /* Tamanho menor */
+            width: 10px; /* Tamanho menor */
+            border: 2px solid white; /* Borda branca */
+            border-radius: 50%; /* Redondo */
+        }
+        .user-status-indicator.online {
+            background-color: #22c55e; /* Verde */
+        }
+         .user-status-indicator.offline {
+            background-color: #ef4444; /* Vermelho */
+         }
+         .user-status-indicator.busy {
+            background-color: #f97316; /* Laranja */
+         }
+
+
+    </style>
+</head>
+<body>
+    <div class="registration-screen" id="registration-screen">
+        <div class="registration-form">
+            <h2>Criar Conta</h2>
+            <div>
+                <label for="full-name-input">Nome Completo:</label>
+                <input type="text" id="full-name-input" placeholder="Seu nome completo">
+            </div>
+             <div>
+                <label for="nickname-input">Apelido:</label>
+                <input type="text" id="nickname-input" placeholder="Como quer ser chamado">
+            </div>
+            <div>
+                <label for="phone-input">Número de Contato:</label>
+                <input type="tel" id="phone-input" placeholder="Ex: (XX) 9XXXX-XXXX">
+            </div>
+            <div>
+                <label for="email-input">Email:</label>
+                <input type="email" id="email-input" placeholder="Seu melhor email">
+            </div>
+             <p class="error-message" id="registration-error-message"></p>
+            <button id="register-button">Cadastrar</button>
+        </div>
+    </div>
+
+    <div class="chat-container" id="chat-container">
+        <div class="sidebar" id="sidebar">
+            <div class="p-4 border-b border-gray-300 flex items-center justify-between">
+                 <button class="back-button mr-3 p-1 rounded-full hover:bg-gray-200" id="back-to-contacts" title="Voltar para Contatos">
+                     <i class="fas fa-arrow-left"></i>
+                </button>
+                 <div class="relative flex-shrink-0 mr-3">
+                     <button class="p-1 rounded-full hover:bg-gray-200" id="profile-button" title="Ver Perfil">
+                         <i class="fas fa-user-circle fa-lg text-gray-600"></i>
+                     </button>
+                     <span id="user-status-dot" class="user-status-indicator"></span>
+                 </div>
+
+                <div class="search-input-container flex-grow">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" id="search-contact" placeholder="Buscar ou iniciar conversa" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow">
+                </div>
+            </div>
+
+            <div class="p-4 border-b border-gray-300 text-center">
+                <button class="text-sm text-blue-600 hover:text-blue-800" id="invite-contact-button" title="Convidar Novo Usuário">
+                    <i class="fas fa-user-plus mr-1"></i> Convidar Novo Usuário
+                </button>
+            </div>
+
+            <div id="contact-list" class="overflow-y-auto flex-grow">
+                <div id="no-contacts-found" class="hidden">Nenhum contato encontrado.</div>
+            </div>
+            </div>
+
+        <div class="chat-area" id="chat-area">
+            <div id="chat-header" class="p-4 border-b border-gray-300 bg-gray-50 flex items-center space-x-3">
+                <div class="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center text-xl text-white">
+                    <i class="fas fa-user-circle"></i>
+                 </div>
+                 <div>
+                    <h2 id="chat-with-name" class="font-semibold text-lg text-gray-800">Selecione um contato</h2>
+                    <p id="chat-with-status" class="text-xs text-gray-500">Offline</p>
+                 </div>
+            </div>
+
+            <div id="message-list" class="flex-grow p-6 space-y-4 overflow-y-auto bg-gray-100">
+                <div class="text-center text-gray-500 py-10" id="initial-message-placeholder">
+                    <i class="fas fa-comment-dots fa-3x mb-2"></i>
+                    <p>Selecione um contato para iniciar a conversa.</p>
+                 </div>
+            </div>
+
+            <div class="p-4 border-t border-gray-300 bg-gray-50">
+                <div class="flex items-center space-x-3 chat-input">
+                    <button class="p-2 text-gray-500 hover:text-blue-500" title="Anexar arquivo">
+                        <i class="fas fa-paperclip fa-lg"></i>
+                    </button>
+                    <input type="text" id="message-input" placeholder="Digite sua mensagem..." class="flex-grow p-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow" disabled>
+                    <button id="send-button" class="bg-blue-500 hover:bg-blue-600 text-white p-3 rounded-full w-12 h-12 flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed" disabled title="Enviar mensagem">
+                        <i class="fas fa-paper-plane fa-lg"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="settings-modal-overlay" id="settings-modal-overlay">
+        <div class="settings-modal" id="settings-modal">
+            <h2>Meu Perfil</h2>
+            <div class="form-group">
+                <label for="profile-full-name-input">Nome Completo:</label>
+                <input type="text" id="profile-full-name-input" placeholder="Seu nome completo" disabled> </div>
+             <div class="form-group">
+                <label for="profile-nickname-input">Apelido:</label>
+                <input type="text" id="profile-nickname-input" placeholder="Como quer ser chamado">
+            </div>
+            <div class="form-group">
+                <label for="profile-phone-input">Número de Contato:</label>
+                <input type="tel" id="profile-phone-input" placeholder="Ex: (XX) 9XXXX-XXXX" disabled> </div>
+            <div class="form-group">
+                <label for="profile-email-input">Email:</label>
+                <input type="email" id="profile-email-input" placeholder="Seu melhor email" disabled> </div>
+
+            <div class="form-group">
+                <label for="profile-status-select">Status:</label>
+                <select id="profile-status-select" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow">
+                    <option value="online">Online</option>
+                    <option value="offline">Offline</option>
+                    <option value="busy">Ocupado</option>
+                </select>
+            </div>
+
+            <div class="button-group">
+                <button class="cancel-button" id="cancel-profile-button">Fechar</button>
+                <button class="save-button" id="save-profile-button">Salvar Perfil</button>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        // --- Simulação de Dados e Backend ---
+        // Estes dados simulariam a resposta de um backend real
+        const initialSimulatedBackendData = {
+            // Dados do usuário atual (serão preenchidos no cadastro ou carregados do localStorage)
+            currentUser: null, // Começa como null
+            contacts: [], // Lista de contatos começa vazia
+            // Lista de TODOS os usuários potenciais no sistema simulado
+            allPotentialUsers: [
+                 // Inclui os contatos iniciais como potenciais usuários
+                { id: 1, fullName: 'Alice Silva', name: 'Alice', phone: '11987654321', email: 'alice@example.com', avatar: 'https://placehold.co/100x100/A9D1F7/4F4F4F?text=AS', online: true },
+                { id: 2, fullName: 'Bruno Costa', name: 'Bruno', phone: '21987654321', email: 'bruno@example.com', avatar: 'https://placehold.co/100x100/F7C9A9/4F4F4F?text=BC', online: false },
+                { id: 3, fullName: 'Carla Dias', name: 'Carla', phone: '31987654321', email: 'carla@example.com', avatar: 'https://placehold.co/100x100/A9F7C0/4F4F4F?text=CD', online: true },
+                { id: 4, fullName: 'Daniel Alves', name: 'Daniel', phone: '41987654321', email: 'daniel@example.com', avatar: 'https://placehold.co/100x100/F7A9A9/4F4F4F?text=DA', online: false },
+                { id: 5, fullName: 'Eduarda Lima', name: 'Eduarda', phone: '51987654321', email: 'eduarda@example.com', avatar: 'https://placehold.co/100x100/D8A9F7/4F4F4F?text=EL', online: true },
+                 // Novos usuários potenciais
+                { id: 6, fullName: 'Fernando Rocha', name: 'Fernando', phone: '61987654321', email: 'fernando@example.com', avatar: 'https://placehold.co/100x100/FFD700/4F4F4F?text=FR', online: true },
+                { id: 7, fullName: 'Juliana Gomes', name: 'Juliana', phone: '71987654321', email: 'juliana@example.com', avatar: 'https://placehold.co/100x100/98FB98/4F4F4F?text=JG', online: false },
+                { id: 8, fullName: 'Gustavo Pereira', name: 'Gustavo', phone: '81987654321', email: 'gustavo@example.com', avatar: 'https://placehold.co/100x100/ADD8E6/4F4F4F?text=GP', online: true },
+                 { id: 9, fullName: 'Heloísa Fernandes', name: 'Heloísa', phone: '91987654321', email: 'heloisa@example.com', avatar: 'https://placehold.co/100x100/EE82EE/4F4F4F?text=HF', online: false },
+            ],
+             // Mensagens associadas aos IDs de usuário (simuladas)
+            messages: {
+                1: [
+                    { senderId: 1, text: 'Oi, tudo bem?', time: '10:28', type: 'received' },
+                    { senderId: 0, text: 'Tudo ótimo, e com você?', time: '10:29', type: 'sent' }, // senderId 0 representa o usuário atual
+                    { senderId: 1, text: 'Tudo certo por aqui também!', time: '10:30', type: 'received' }
+                ],
+                2: [
+                    { senderId: 2, text: 'E aí, firmeza?', time: 'Ontem 09:15', type: 'received' },
+                    { senderId: 0, text: 'Opa, tudo certo!', time: 'Ontem 09:16', type: 'sent' },
+                    { senderId: 2, text: 'Vamos marcar aquele café!', time: 'Ontem 09:20', type: 'received' }
+                ],
+                3: [
+                    { senderId: 3, text: 'Reunião às 14h?', time: 'Sexta 10:00', type: 'received' },
+                    { senderId: 0, text: 'Confirmado!', time: 'Sexta 10:01', type: 'sent' },
+                    { senderId: 3, text: 'Ok, combinado!', time: 'Sexta 10:02', type: 'received' }
+                ],
+                4: [
+                    { senderId: 4, text: 'Preciso da sua ajuda com um relatório.', time: '12/05 15:30', type: 'received' },
+                    { senderId: 0, text: 'Claro, pode mandar.', time: '12/05 15:31', type: 'sent' },
+                    { senderId: 4, text: 'Vou te enviar o arquivo.', time: '12/05 15:32', type: 'received' }
+                ],
+                5: [], // Chat vazio
+                 // Chats para novos contatos (inicialmente vazios ou com mensagem de boas-vindas)
+                6: [{ senderId: 6, text: 'Olá! Fui adicionado via link!', time: 'Agora', type: 'received' }],
+                7: [],
+                8: [{ senderId: 8, text: 'Oi! Tudo bem?', time: 'Agora', type: 'received' }],
+                9: [],
+            }
+        };
+
+        // Variável que armazena o estado atual do backend simulado (será carregada ou usará dados iniciais)
+        let simulatedBackend = {};
+
+        // Chaves para o localStorage
+        const LOCAL_STORAGE_CONTACTS_KEY = 'messagingAppSimContacts'; // Chave para contatos
+        const LOCAL_STORAGE_USER_KEY = 'messagingAppCurrentUser'; // Chave para o usuário atual
+
+        // Variável temporária para armazenar o ID do usuário que convidou (ao abrir o link de convite)
+        let invitingUserIdOnLoad = null;
+
+
+        // --- Funções de Persistência (localStorage) ---
+
+        // Salva o estado atual no localStorage
+        function saveStateToLocalStorage() {
+            try {
+                // Salva apenas os contatos e o usuário atual
+                localStorage.setItem(LOCAL_STORAGE_CONTACTS_KEY, JSON.stringify(simulatedBackend.contacts));
+
+                 if (simulatedBackend.currentUser) {
+                     localStorage.setItem(LOCAL_STORAGE_USER_KEY, JSON.stringify(simulatedBackend.currentUser));
+                 } else {
+                     localStorage.removeItem(LOCAL_STORAGE_USER_KEY); // Remove se o usuário não estiver logado
+                 }
+
+                console.log("Estado salvo no localStorage.");
+            } catch (e) {
+                console.error("Erro ao salvar estado no localStorage:", e);
+            }
+        }
+
+        // Carrega o estado do localStorage na inicialização
+        function loadStateFromLocalStorage() {
+            try {
+                const savedContacts = localStorage.getItem(LOCAL_STORAGE_CONTACTS_KEY);
+                const savedUser = localStorage.getItem(LOCAL_STORAGE_USER_KEY);
+
+                // Carrega dados iniciais como base
+                simulatedBackend = JSON.parse(JSON.stringify(initialSimulatedBackendData)); // Cria uma cópia profunda
+
+                if (savedContacts) {
+                    const parsedContacts = JSON.parse(savedContacts);
+                    // Usa os contatos salvos
+                    simulatedBackend.contacts = parsedContacts;
+                    console.log("Contatos carregados do localStorage.");
+                } else {
+                    console.log("Nenhum contato salvo encontrado.");
+                     // Se não houver contatos salvos, a lista inicial já é vazia
+                }
+
+                 if (savedUser) {
+                     simulatedBackend.currentUser = JSON.parse(savedUser);
+                     console.log("Usuário carregado do localStorage.");
+                 } else {
+                     console.log("Nenhum usuário salvo encontrado.");
+                 }
+
+                 // Mensagens e lista de potenciais sempre vêm dos dados iniciais nesta simulação
+                 simulatedBackend.messages = initialSimulatedBackendData.messages;
+                 simulatedBackend.allPotentialUsers = initialSimulatedBackendData.allPotentialUsers;
+
+
+            } catch (e) {
+                console.error("Erro ao carregar estado do localStorage:", e);
+                 // Em caso de erro ao carregar, usa os dados iniciais como fallback
+                 simulatedBackend = JSON.parse(JSON.stringify(initialSimulatedBackendData)); // Cria uma cópia profunda
+                 console.log("Usando dados iniciais devido a erro de carregamento.");
+            }
+             // Garante que allContacts reflita simulatedBackend.contacts após carregar
+             allContacts = [...simulatedBackend.contacts];
+        }
+
+
+        // --- Funções de Simulação de Backend (usando dados em memória) ---
+
+        // Simula a busca de contatos do backend (usando dados em memória)
+        function fetchContacts() {
+            return new Promise(resolve => {
+                setTimeout(() => {
+                    // Retorna uma cópia dos contatos atuais do estado simulado
+                    resolve(simulatedBackend.contacts.map(contact => ({ ...contact })));
+                }, 50); // Atraso menor após implementar localStorage
+            });
+        }
+
+        // Simula a busca de mensagens para um contato específico (usando dados em memória)
+        function fetchMessages(contactId) {
+             return new Promise(resolve => {
+                setTimeout(() => {
+                     // Retorna uma cópia das mensagens para o contactId, ou um array vazio se não houver
+                    resolve((simulatedBackend.messages[contactId] || []).map(msg => ({ ...msg })));
+                }, 50); // Atraso menor
+            });
+        }
+
+        // Simula o envio de uma mensagem para o backend e o recebimento de uma resposta
+        function sendMessageToBackend(contactId, text) {
+             return new Promise(resolve => {
+                setTimeout(() => {
+                    const newMessage = {
+                        senderId: simulatedBackend.currentUser.id, // Usa o ID do usuário atual
+                        text: text,
+                        time: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+                        type: 'sent'
+                    };
+                     // Adiciona a mensagem enviada aos dados simulados (opcional, para persistir na simulação)
+                    if (!simulatedBackend.messages[contactId]) {
+                        simulatedBackend.messages[contactId] = [];
+                    }
+                    simulatedBackend.messages[contactId].push(newMessage);
+
+                    // Simula uma resposta do contato
+                    const contact = allContacts.find(c => c.id === contactId); // Busca na lista atual de contatos
+                    let replyMessage = null;
+                    if (contact && contact.online) {
+                        // --- Lógica para gerar resposta contextual (SIMULADA) ---
+                        let replyText = "Entendido! 👍"; // Resposta padrão
+
+                        const lowerText = text.toLowerCase();
+
+                        if (lowerText.includes('olá') || lowerText.includes('oi') || lowerText.includes('tudo bem')) {
+                            replyText = `Olá! Tudo ótimo por aqui!`; // Resposta genérica sem nome do contato
+                        } else if (lowerText.includes('marcar') || lowerText.includes('reunião') || lowerText.includes('café')) {
+                            replyText = `Claro! Qual horário seria bom para você?`;
+                        } else if (lowerText.includes('arquivo') || lowerText.includes('documento') || lowerText.includes('relatório')) {
+                             replyText = `Ok, estou aguardando o arquivo!`;
+                        } else if (lowerText.includes('ajuda') || lowerText.includes('dúvida')) {
+                             replyText = `Posso ajudar! Qual é a sua dúvida?`;
+                        } else if (lowerText.includes('obrigado') || lowerText.includes('valeu')) {
+                             replyText = `De nada! 😊`;
+                        } else if (lowerText.includes('até mais') || lowerText.includes('tchau')) {
+                             replyText = `Até logo!`;
+                        } else if (lowerText.includes('como você está')) {
+                             replyText = `Estou bem, obrigado por perguntar! E você?`;
+                        } else if (lowerText.includes('o que você faz')) {
+                            replyText = `Sou um contato simulado neste aplicativo. 😊`;
+                        }
+                        // --- Fim da Lógica de Resposta ---
+
+                         replyMessage = {
+                            senderId: contactId,
+                            text: replyText,
+                            time: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+                            type: 'received'
+                        };
+                        // Adiciona a resposta aos dados simulados
+                        if (!simulatedBackend.messages[contactId]) {
+                             simulatedBackend.messages[contactId] = [];
+                        }
+                        simulatedBackend.messages[contactId].push(replyMessage);
+                    }
+
+                    // Resolve com a mensagem enviada e a resposta simulada (se houver)
+                    resolve({ sent: newMessage, received: replyMessage });
+
+                }, 200 + Math.random() * 200); // Simula um atraso para envio e resposta
+            });
+        }
+
+        // --- Elementos do DOM ---
+        const registrationScreenEl = document.getElementById('registration-screen');
+        const chatContainerEl = document.getElementById('chat-container');
+        const fullNameInputEl = document.getElementById('full-name-input');
+        const nicknameInputEl = document.getElementById('nickname-input');
+        const phoneInputEl = document.getElementById('phone-input');
+        const emailInputEl = document.getElementById('email-input');
+        const registerButtonEl = document.getElementById('register-button');
+        const registrationErrorMessageEl = document.getElementById('registration-error-message');
+
+
+        const sidebarEl = document.getElementById('sidebar');
+        const chatAreaEl = document.getElementById('chat-area');
+        const contactListEl = document.getElementById('contact-list');
+        const messageListEl = document.getElementById('message-list');
+        const chatHeaderEl = document.getElementById('chat-header');
+        const messageInputEl = document.getElementById('message-input');
+        const sendButtonEl = document.getElementById('send-button');
+        const searchContactInputEl = document.getElementById('search-contact');
+        const initialMessagePlaceholderEl = document.getElementById('initial-message-placeholder');
+        const noContactsFoundEl = document.getElementById('no-contacts-found');
+        const backButtonEl = document.getElementById('back-to-contacts');
+
+        // Elementos do Modal de Perfil/Configurações
+        const profileButtonEl = document.getElementById('profile-button'); // Novo botão de perfil
+        const userStatusDotEl = document.getElementById('user-status-dot'); // Indicador de status do usuário
+        const settingsModalOverlayEl = document.getElementById('settings-modal-overlay'); // Reutilizado para Perfil
+        const settingsModalEl = document.getElementById('settings-modal'); // Reutilizado para Perfil
+        const profileFullNameInputEl = document.getElementById('profile-full-name-input'); // Campo nome completo no perfil
+        const profileNicknameInputEl = document.getElementById('profile-nickname-input'); // Campo apelido no perfil
+        const profilePhoneInputEl = document.getElementById('profile-phone-input'); // Campo telefone no perfil
+        const profileEmailInputEl = document.getElementById('profile-email-input'); // Campo email no perfil
+        const profileStatusSelectEl = document.getElementById('profile-status-select'); // Select de status no perfil
+        const saveProfileButtonEl = document.getElementById('save-profile-button'); // Botão salvar no perfil
+        const cancelProfileButtonEl = document.getElementById('cancel-profile-button'); // Botão cancelar no modal de perfil
+
+
+        // Elementos do Convite
+        const inviteContactButtonEl = document.getElementById('invite-contact-button');
+
+
+        // --- Variáveis de Estado ---
+        let allContacts = []; // Lista completa de contatos (do backend simulado)
+        let currentChatId = null; // ID do chat atualmente aberto
+        let currentChatMessages = []; // Mensagens do chat atual
+
+        // --- Funções de Renderização ---
+
+        // Renderiza a lista de contatos na barra lateral
+        function renderContacts(contactsToRender) {
+            contactListEl.innerHTML = ''; // Limpa a lista atual
+            if (contactsToRender.length === 0) {
+                 noContactsFoundEl.classList.remove('hidden'); // Mostra mensagem de nenhum contato
+                 return;
+            } else {
+                 noContactsFoundEl.classList.add('hidden'); // Esconde mensagem
+            }
+
+            // Ordena os contatos pela última mensagem (simulado)
+            contactsToRender.sort((a, b) => {
+                 // Implementação de ordenação simplificada baseada no timestamp string
+                 // Em um app real, usariamos objetos Date ou timestamps numéricos
+                 const timeA = new Date(a.timestamp).getTime() || 0; // Tenta criar Data, fallback para 0
+                 const timeB = new Date(b.timestamp).getTime() || 0;
+                 return timeB - timeA; // Mais recente primeiro
+            });
+
+
+            contactsToRender.forEach(contact => {
+                const contactEl = document.createElement('div');
+                // Adiciona classes Tailwind e a classe 'active' se for o chat atual
+                contactEl.className = `contact p-4 flex items-center space-x-3 hover:bg-gray-200 cursor-pointer border-b border-gray-200 transition-colors ${contact.id === currentChatId ? 'active bg-blue-100' : ''}`;
+                contactEl.setAttribute('data-contact-id', contact.id); // Armazena o ID no elemento
+
+                contactEl.innerHTML = `
+                    <div class="relative flex-shrink-0">
+                        <img src="${contact.avatar}" alt="${contact.name}" class="w-12 h-12 rounded-full object-cover" onerror="this.onerror=null;this.src='https://placehold.co/100x100/cccccc/ffffff?text=?';">
+                        ${contact.online ? '<span class="absolute bottom-0 right-0 block h-3 w-3 bg-green-500 border-2 border-white rounded-full"></span>' : ''}
+                    </div>
+                    <div class="flex-grow overflow-hidden">
+                        <h3 class="font-semibold text-gray-800 truncate">${contact.name}</h3>
+                        <p class="text-sm text-gray-500 truncate">${contact.lastMessage || ''}</p> </div>
+                    <div class="text-right text-xs text-gray-400 flex-shrink-0">
+                        <p>${contact.timestamp || ''}</p> ${contact.unread > 0 ? `<span class="mt-1 inline-block bg-blue-500 text-white text-xs px-2 py-0.5 rounded-full">${contact.unread}</span>` : ''}
+                    </div>
+                `;
+                // Adiciona o listener para selecionar o chat
+                contactEl.addEventListener('click', () => selectChat(contact.id));
+                contactListEl.appendChild(contactEl);
+            });
+        }
+
+        // Renderiza as mensagens na área de chat
+        function renderMessages(messagesToRender) {
+            messageListEl.innerHTML = ''; // Limpa a lista atual
+
+            if (messagesToRender.length === 0) {
+                 // Mostra a mensagem de chat vazio se não houver mensagens
+                 messageListEl.innerHTML = `
+                    <div class="text-center text-gray-500 py-10">
+                        <i class="fas fa-comment-dots fa-3x mb-2"></i>
+                        <p>Nenhuma mensagem ainda. Envie uma para começar!</p>
+                    </div>`;
+                 return;
+            }
+
+            // Esconde o placeholder inicial se houver mensagens
+            initialMessagePlaceholderEl.classList.add('hidden');
+
+            messagesToRender.forEach(msg => {
+                const messageDiv = document.createElement('div');
+                 // Determina o alinhamento e a cor da bolha com base no tipo (sent/received)
+                messageDiv.className = `flex ${msg.type === 'sent' ? 'justify-end' : 'justify-start'} mb-2`;
+
+                messageDiv.innerHTML = `
+                    <div class="message-bubble ${msg.type}">
+                        <p class="text-sm">${msg.text}</p>
+                        <p class="text-xs ${msg.type === 'sent' ? 'text-blue-200' : 'text-gray-400'} mt-1 text-right">${msg.time}</p>
+                    </div>
+                `;
+                messageListEl.appendChild(messageDiv);
+            });
+            scrollToBottom(); // Rola para a última mensagem
+        }
+
+        // Atualiza o cabeçalho da área de chat com as informações do contato
+        function updateChatHeader(contact) {
+             chatHeaderEl.innerHTML = `
+                <div class="flex items-center space-x-3 flex-grow">
+                     <button class="back-button mr-3 p-1 rounded-full hover:bg-gray-200" id="back-to-contacts-header" title="Voltar para Contatos">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <div class="relative flex-shrink-0">
+                        <img src="${contact.avatar}" alt="${contact.name}" class="w-12 h-12 rounded-full object-cover" onerror="this.onerror=null;this.src='https://placehold.co/100x100/cccccc/ffffff?text=?';">
+                        ${contact.online ? '<span class="absolute bottom-0 right-0 block h-3 w-3 bg-green-500 border-2 border-white rounded-full"></span>' : ''}
+                    </div>
+                    <div>
+                        <h2 id="chat-with-name" class="font-semibold text-lg text-gray-800">${contact.name}</h2>
+                        <p id="chat-with-status" class="text-xs ${contact.online ? 'text-green-600' : 'text-gray-500'}">${contact.online ? 'Online' : 'Offline'}</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-2 flex-shrink-0">
+                    <button id="generate-link-btn" class="p-2 text-gray-500 hover:text-blue-500" title="Gerar link para esta conversa">
+                        <i class="fas fa-link"></i>
+                    </button>
+                    <button class="p-2 text-gray-500 hover:text-blue-500" title="Chamada de áudio"><i class="fas fa-phone-alt"></i></button>
+                    <button class="p-2 text-gray-500 hover:text-blue-500" title="Chamada de vídeo"><i class="fas fa-video"></i></button>
+                    <button class="p-2 text-gray-500 hover:text-blue-500" title="Mais opções"><i class="fas fa-ellipsis-v"></i></button>
+                </div>
+            `;
+             // Adiciona listener ao novo botão de link gerado
+             const generateLinkBtn = document.getElementById('generate-link-btn');
+             if(generateLinkBtn) generateLinkBtn.addEventListener('click', generateShareLink);
+
+             // Adiciona listener ao novo botão de voltar no cabeçalho
+             const backToContactsHeaderBtn = document.getElementById('back-to-contacts-header');
+             if(backToContactsHeaderBtn) backToContactsHeaderBtn.addEventListener('click', showSidebar);
+        }
+
+        // Atualiza o indicador de status do usuário logado
+        function updateUserStatusIndicator() {
+            // Remove todas as classes de status existentes
+            userStatusDotEl.classList.remove('online', 'offline', 'busy');
+            if (simulatedBackend.currentUser && simulatedBackend.currentUser.status) {
+                userStatusDotEl.style.display = 'block'; // Mostra o ponto
+                userStatusDotEl.classList.add(simulatedBackend.currentUser.status); // Adiciona a classe de status correta
+            } else {
+                 // Esconde se não houver usuário ou status
+                 userStatusDotEl.style.display = 'none';
+            }
+        }
+
+
+        // --- Funções de Lógica ---
+
+        // Seleciona um chat com base no ID do contato
+        async function selectChat(contactId) {
+            // Remove a classe 'active' do contato anteriormente selecionado
+            if (currentChatId) {
+                const prevActiveContactEl = contactListEl.querySelector(`.contact[data-contact-id="${currentChatId}"]`);
+                if (prevActiveContactEl) {
+                    prevActiveContactEl.classList.remove('active', 'bg-blue-100');
+                }
+            }
+
+            currentChatId = contactId; // Atualiza o ID do chat atual
+
+            // Adiciona a classe 'active' ao contato selecionado
+            const activeContactEl = contactListEl.querySelector(`.contact[data-contact-id="${currentChatId}"]`);
+             if (activeContactEl) {
+                activeContactEl.classList.add('active', 'bg-blue-100');
+                 // Remove o contador de mensagens não lidas ao abrir o chat
+                 const unreadSpan = activeContactEl.querySelector('span:last-child');
+                 if(unreadSpan && unreadSpan.classList.contains('rounded-full')) {
+                     unreadSpan.remove();
+                 }
+                  // Atualiza o estado 'unread' no array allContacts
+                 const contactData = allContacts.find(c => c.id === contactId);
+                 if(contactData) {
+                     contactData.unread = 0;
+                 }
+            }
+
+
+            // Encontra o contato selecionado na lista completa
+            const selectedContact = allContacts.find(contact => contact.id === contactId);
+
+            if (selectedContact) {
+                updateChatHeader(selectedContact); // Atualiza o cabeçalho do chat
+
+                // Simula o carregamento das mensagens do backend
+                currentChatMessages = await fetchMessages(contactId);
+                renderMessages(currentChatMessages); // Renderiza as mensagens
+
+                // Habilita a área de input de mensagem
+                messageInputEl.disabled = false;
+                sendButtonEl.disabled = false;
+                messageInputEl.placeholder = `Mensagem para ${selectedContact.name}`;
+                messageInputEl.focus(); // Coloca o foco no input
+                 showChatArea(); // Mostra a área de chat em mobile
+            } else {
+                console.error(`Contato com ID ${contactId} não encontrado.`);
+                 // Reseta a área de chat se o contato não for encontrado
+                 currentChatId = null;
+                 currentChatMessages = [];
+                 updateChatHeader({ name: 'Selecione um contato', online: false, avatar: '' }); // Cabeçalho padrão
+                 renderMessages([]); // Limpa as mensagens
+                 messageInputEl.disabled = true; // Desabilita input
+                 sendButtonEl.disabled = true;
+                 messageInputEl.placeholder = "Selecione um contato...";
+            }
+        }
+
+        // Envia uma mensagem
+        async function sendMessage() {
+            const text = messageInputEl.value.trim();
+            if (text === '' || currentChatId === null) return; // Não envia se o campo estiver vazio ou nenhum chat selecionado
+
+            messageInputEl.value = ''; // Limpa o input imediatamente
+            messageInputEl.disabled = true; // Desabilita enquanto envia
+            sendButtonEl.disabled = true;
+
+            // Simula o envio para o backend e espera a resposta
+            const result = await sendMessageToBackend(currentChatId, text);
+
+            // Adiciona a mensagem enviada à lista de mensagens atual
+            currentChatMessages.push(result.sent);
+
+            // Se houver uma resposta simulada, adiciona também
+            if (result.received) {
+                 currentChatMessages.push(result.received);
+            }
+
+            // Re-renderiza as mensagens para incluir a nova(s) mensagem(ns)
+            renderMessages(currentChatMessages);
+
+            // Atualiza a última mensagem e timestamp na lista de contatos simulada
+            const contact = allContacts.find(c => c.id === currentChatId);
+            if (contact) {
+                 // Usa a última mensagem real (pode ser a enviada ou a resposta)
+                 const lastMsg = currentChatMessages[currentChatMessages.length - 1];
+                 contact.lastMessage = lastMsg.text;
+                 contact.timestamp = lastMsg.time;
+                 // Re-renderiza a lista de contatos para refletir a mudança e a ordenação
+                 filterAndRenderContacts(); // Filtra e renderiza com base na busca atual
+            }
+
+            // Salva o estado após enviar uma mensagem (opcional, dependendo da granularidade do save)
+            // saveStateToLocalStorage();
+
+
+            messageInputEl.disabled = false; // Habilita input novamente
+            sendButtonEl.disabled = false;
+            messageInputEl.focus(); // Retorna o foco
+            scrollToBottom(); // Rola para o final
+        }
+
+        // Rola a área de mensagens para o final
+        function scrollToBottom() {
+            messageListEl.scrollTop = messageListEl.scrollHeight;
+        }
+
+        // Gera e copia o link de compartilhamento do CHAT ATUAL
+        function generateShareLink() {
+            if (currentChatId === null) {
+                showMessageBox("Por favor, selecione uma conversa primeiro para gerar um link.");
+                return;
+            }
+            // Pega a URL base (sem hash ou query params)
+            const baseUrl = window.location.href.split('#')[0].split('?')[0];
+            const shareableLink = `${baseUrl}?chatId=${currentChatId}`;
+
+            // Tenta copiar para a área de transferência
+            navigator.clipboard.writeText(shareableLink).then(() => {
+                 showMessageBox(`Link da conversa copiado!\n\n${shareableLink}\n\nPode colar numa nova aba para testar.`);
+            }).catch(err => {
+                console.warn('Falha ao copiar para a área de transferência: ', err);
+                 // Fallback para prompt se a cópia falhar
+                prompt("Copie este link manualmente:", shareableLink);
+            });
+        }
+
+        // Gera e copia o link para ADICIONAR UM NOVO USUÁRIO (convite de usuário)
+        function generateInviteLink() {
+             if (!simulatedBackend.currentUser) {
+                 showMessageBox("Você precisa estar cadastrado para convidar outros usuários.");
+                 return;
+             }
+
+            // Pega a URL base (sem hash ou query params)
+            const baseUrl = window.location.href.split('#')[0].split('?')[0];
+            // Adiciona o parâmetro inviteUserId com o ID do usuário ATUAL
+            const inviteLink = `${baseUrl}?inviteUserId=${simulatedBackend.currentUser.id}`;
+
+            // Tenta copiar para a área de transferência
+            navigator.clipboard.writeText(inviteLink).then(() => {
+                 showMessageBox(`Link de convite gerado e copiado!\n\nEnvie este link para convidar alguém para se conectar com você:\n${inviteLink}\n\nInstruções:\n1. Peça para a pessoa abrir este link em um navegador onde ela AINDA NÃO se cadastrou neste app simulado.\n2. Ela fará o cadastro.\n3. Após o cadastro, você aparecerá automaticamente na lista de contatos dela, e ela aparecerá na sua lista (pode ser necessário recarregar a página).`);
+            }).catch(err => {
+                console.warn('Falha ao copiar para a área de transferência: ', err);
+                prompt("Copie este link manualmente:", inviteLink);
+            });
+        }
+
+
+        // Processa os parâmetros da URL na inicialização (chatId ou inviteUserId)
+        async function processUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            const chatIdFromUrl = params.get('chatId');
+            const inviteUserIdFromUrl = params.get('inviteUserId'); // Novo parâmetro para convite de usuário
+
+            // Carrega o estado do localStorage (incluindo o usuário e contatos)
+            loadStateFromLocalStorage();
+
+            // Verifica se o usuário já está cadastrado
+            if (simulatedBackend.currentUser) {
+                // Usuário cadastrado, mostra a tela de chat
+                showChatScreen();
+                updateUserStatusIndicator(); // Atualiza o indicador de status do usuário
+
+                // Processa o link de convite de usuário, SE o usuário já está cadastrado E o inviteUserId está na URL
+                // NOTA: A lógica de adicionar o contato ao usuário RECÉM-CADASTRADO foi movida para registerUser.
+                // Esta parte só adicionaria o contato se o usuário JÁ ESTIVESSE CADASTRADO e abrisse o link.
+                // Vamos manter a lógica de adicionar o contato SOMENTE no momento do cadastro para simplificar a simulação.
+                // Portanto, esta seção de processamento de inviteUserId para usuários JÁ CADASTRADOS pode ser removida
+                // ou modificada para apenas exibir uma mensagem.
+                // Por enquanto, vamos deixar a lógica principal de convite acontecer no registerUser.
+
+                // Agora renderiza a lista de contatos (incluindo o novo, se adicionado via convite ANTERIORMENTE)
+                filterAndRenderContacts();
+
+                // Processa o link de chat, se existir (DEPOIS de carregar/adicionar contatos)
+                if (chatIdFromUrl) {
+                    const contactId = parseInt(chatIdFromUrl);
+                    // Busca na lista allContacts (que agora inclui contatos do localStorage)
+                    const contactToOpen = allContacts.find(c => c.id === contactId);
+
+                    if (contactToOpen) {
+                         // Usa setTimeout para garantir que a renderização inicial já ocorreu
+                        setTimeout(() => {
+                             selectChat(contactToOpen.id);
+                             // Limpa o parâmetro chatId da URL após abrir (opcional)
+                             // window.history.replaceState({}, document.title, window.location.pathname);
+                        }, 100);
+                    } else {
+                        console.warn(`Contato com ID ${chatIdFromUrl} (da URL) não encontrado.`);
+                         // Limpa o parâmetro chatId da URL se não encontrado (opcional)
+                         // window.history.replaceState({}, document.title, window.location.pathname);
+                    }
+                }
+                 // Se não houver chatId na URL, a lista de contatos já foi renderizada acima
+            } else {
+                // Usuário não cadastrado, mostra a tela de cadastro
+                showRegistrationScreen();
+                 // Se houver um inviteUserId na URL E o usuário NÃO ESTÁ CADASTRADO, armazena o ID do convidante.
+                 if (inviteUserIdFromUrl) {
+                     invitingUserIdOnLoad = parseInt(inviteUserIdFromUrl);
+                     console.log(`InviteUserId ${invitingUserIdOnLoad} detectado. Será processado após o cadastro.`);
+                 }
+            }
+        }
+
+
+        // Filtra e renderiza os contatos com base no termo de busca
+        function filterAndRenderContacts() {
+            const searchTerm = searchContactInputEl.value.toLowerCase();
+            // Filtra a partir da lista completa (allContacts)
+            const filtered = allContacts.filter(contact =>
+                contact.name.toLowerCase().includes(searchTerm) ||
+                (contact.lastMessage && contact.lastMessage.toLowerCase().includes(searchTerm)) // Opcional: buscar na última mensagem (verifica se lastMessage existe)
+            );
+            renderContacts(filtered); // Renderiza a lista filtrada
+        }
+
+        // Função para mostrar a barra lateral (usado em mobile)
+        function showSidebar() {
+            sidebarEl.classList.add('open');
+            chatAreaEl.classList.remove('active');
+        }
+
+        // Função para mostrar a área de chat (usado em mobile)
+        function showChatArea() {
+            sidebarEl.classList.remove('open');
+            chatAreaEl.classList.add('active');
+        }
+
+         // Função para mostrar a tela de cadastro
+        function showRegistrationScreen() {
+            registrationScreenEl.classList.add('visible');
+            chatContainerEl.style.display = 'none'; // Esconde o container do chat
+        }
+
+         // Função para mostrar a tela de chat
+        function showChatScreen() {
+            registrationScreenEl.classList.remove('visible');
+            chatContainerEl.style.display = 'flex'; // Mostra o container do chat
+        }
+
+
+        // Função para abrir o modal de Perfil
+        function openProfileModal() {
+            // Carrega os dados atuais do usuário simulado nos inputs do modal de perfil
+            if (simulatedBackend.currentUser) {
+                 profileFullNameInputEl.value = simulatedBackend.currentUser.fullName || '';
+                 profileNicknameInputEl.value = simulatedBackend.currentUser.name || ''; // Apelido é o nome de exibição
+                 profilePhoneInputEl.value = simulatedBackend.currentUser.phone || '';
+                 profileEmailInputEl.value = simulatedBackend.currentUser.email || '';
+                 profileStatusSelectEl.value = simulatedBackend.currentUser.status || 'offline'; // Carrega o status atual
+
+                 // Campos desabilitados conforme a simulação permite editar apenas o apelido e status
+                 profileFullNameInputEl.disabled = true;
+                 profilePhoneInputEl.disabled = true;
+                 profileEmailInputEl.disabled = true;
+                 profileNicknameInputEl.disabled = false; // Apelido é editável
+                 profileStatusSelectEl.disabled = false; // Status é editável
+                 saveProfileButtonEl.disabled = false; // Habilita botão salvar
+            } else {
+                 // Se não houver usuário logado (não deveria acontecer se o botão estiver visível)
+                 profileFullNameInputEl.value = '';
+                 profileNicknameInputEl.value = '';
+                 profilePhoneInputEl.value = '';
+                 profileEmailInputEl.value = '';
+                 profileStatusSelectEl.value = 'offline';
+                 profileFullNameInputEl.disabled = true;
+                 profileNicknameInputEl.disabled = true;
+                 profilePhoneInputEl.disabled = true;
+                 profileEmailInputEl.disabled = true;
+                 profileStatusSelectEl.disabled = true;
+                 saveProfileButtonEl.disabled = true;
+            }
+             // Muda o título do modal para "Meu Perfil"
+            settingsModalEl.querySelector('h2').textContent = "Meu Perfil";
+            settingsModalOverlayEl.classList.add('visible');
+        }
+
+        // Função para fechar o modal (Perfil/Configurações)
+        function closeSettingsModal() {
+            settingsModalOverlayEl.classList.remove('visible');
+             // Limpa a mensagem de erro ao fechar (se estiver sendo usada no modal)
+             registrationErrorMessageEl.style.display = 'none';
+             registrationErrorMessageEl.textContent = '';
+             // Restaura o título padrão do modal se necessário (embora Perfil seja o único uso agora)
+             settingsModalEl.querySelector('h2').textContent = "Configurações do Usuário";
+        }
+
+        // Função para salvar as configurações do usuário (agora focado no Perfil)
+        function saveProfileSettings() {
+            const newNickname = profileNicknameInputEl.value.trim();
+            const newStatus = profileStatusSelectEl.value;
+
+            if (newNickname) {
+                if (simulatedBackend.currentUser) {
+                    simulatedBackend.currentUser.name = newNickname; // Atualiza o apelido
+                    simulatedBackend.currentUser.status = newStatus; // Atualiza o status
+
+                    // Salva o estado atualizado no localStorage
+                    saveStateToLocalStorage();
+                    updateUserStatusIndicator(); // Atualiza o indicador visual de status
+
+                    showMessageBox("Perfil atualizado com sucesso!");
+                    closeSettingsModal();
+                     // Em um app real, talvez fosse necessário re-renderizar algo que mostre o nome do usuário
+                } else {
+                     showMessageBox("Erro: Usuário não encontrado para salvar perfil.");
+                }
+            } else {
+                showMessageBox("O apelido não pode estar vazio.");
+            }
+        }
+
+         // Função para lidar com o cadastro de um novo usuário
+        function registerUser() {
+            const fullName = fullNameInputEl.value.trim();
+            const nickname = nicknameInputEl.value.trim();
+            const phone = phoneInputEl.value.trim();
+            const email = emailInputEl.value.trim();
+
+            // Validação simples
+            if (!fullName || !nickname || !phone || !email) {
+                registrationErrorMessageEl.textContent = "Por favor, preencha todos os campos.";
+                registrationErrorMessageEl.style.display = 'block';
+                return;
+            }
+
+            // Simula a criação de um novo usuário com um ID único (baseado no timestamp para simulação)
+            const newUserId = Date.now(); // ID baseado no timestamp atual
+
+            const newUser = {
+                id: newUserId, // ID único para o usuário atual
+                fullName: fullName,
+                name: nickname, // Usa o apelido como nome de exibição
+                phone: phone,
+                email: email,
+                avatar: `https://placehold.co/100x100/${Math.floor(Math.random()*16777215).toString(16)}/ffffff?text=${nickname.substring(0, 2).toUpperCase()}`, // Gera avatar com cor aleatória
+                status: 'online' // Define o status inicial como online
+            };
+
+            simulatedBackend.currentUser = newUser; // Define o usuário atual
+            simulatedBackend.contacts = []; // Garante que a lista de contatos do novo usuário comece vazia
+
+            // *** Lógica para processar o inviteUserId APÓS o cadastro ***
+            if (invitingUserIdOnLoad !== null) {
+                 const invitingUserId = invitingUserIdOnLoad;
+                 const invitingUser = simulatedBackend.allPotentialUsers.find(user => user.id === invitingUserId);
+
+                 if (invitingUser) {
+                     // Adiciona o usuário que convidou como um contato para o NOVO usuário
+                     const newContact = {
+                         id: invitingUser.id,
+                         name: invitingUser.name,
+                         avatar: invitingUser.avatar,
+                         lastMessage: 'Conectado via link!',
+                         timestamp: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+                         unread: 1,
+                         online: invitingUser.online
+                     };
+                     simulatedBackend.contacts.push(newContact);
+                     // Não precisamos atualizar allContacts aqui imediatamente, pois filterAndRenderContacts será chamado logo
+                     console.log(`Usuário ${invitingUser.name} adicionado aos contatos do novo usuário.`);
+
+                     // Opcional: Adicionar o novo usuário à lista de contatos do convidante?
+                     // Em um app real, isso seria uma ação no backend que notificaria o convidante.
+                     // Nesta simulação, o convidante verá o novo contato ao recarregar a página,
+                     // pois o novo usuário (com seu ID gerado) não existia na lista allPotentialUsers
+                     // do convidante antes, mas agora pode ser "encontrado" ao processar o link
+                     // (embora a lógica atual só adicione o convidante ao novo usuário).
+                     // Para uma simulação mais completa, precisaríamos de uma forma de atualizar o localStorage do convidante.
+                     // Por enquanto, a adição unilateral (convidante -> novo usuário) é suficiente para demonstrar o fluxo básico.
+
+                 } else {
+                     console.warn(`Usuário convidante com ID ${invitingUserId} não encontrado na lista potencial durante o cadastro.`);
+                 }
+                 // Limpa o ID do convidante após processar
+                 invitingUserIdOnLoad = null;
+            }
+             // *** Fim da Lógica de Processamento do Convite no Cadastro ***
+
+
+            saveStateToLocalStorage(); // Salva o novo usuário e a lista de contatos (potencialmente com o convidante)
+
+            showMessageBox("Cadastro realizado com sucesso!");
+
+            // Oculta a tela de cadastro e mostra a tela de chat
+            showChatScreen();
+            updateUserStatusIndicator(); // Atualiza o indicador de status do usuário
+             // Re-renderiza a lista de contatos (que agora pode conter o convidante)
+             allContacts = [...simulatedBackend.contacts]; // Atualiza a variável local
+             filterAndRenderContacts();
+
+             // Opcional: Limpar os campos do formulário após o cadastro
+             fullNameInputEl.value = '';
+             nicknameInputEl.value = '';
+             phoneInputEl.value = '';
+             emailInputEl.value = '';
+             registrationErrorMessageEl.style.display = 'none';
+             registrationErrorMessageEl.textContent = '';
+        }
+
+
+         // Função simples para exibir mensagens ao usuário (substitui alert)
+        function showMessageBox(message) {
+            // Implementação simples: usar alert por enquanto, mas idealmente seria um modal customizado
+            alert(message);
+        }
+
+
+        // --- Event Listeners ---
+
+        // Evento de clique no botão de enviar
+        sendButtonEl.addEventListener('click', sendMessage);
+
+        // Evento de tecla pressionada no input de mensagem (para enviar com Enter)
+        messageInputEl.addEventListener('keypress', function(e) {
+            // Envia se a tecla for Enter e Shift não estiver pressionado (para permitir quebra de linha)
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault(); // Previne a quebra de linha padrão do Enter
+                sendMessage();
+            }
+        });
+
+        // Evento de input no campo de busca (para filtrar em tempo real)
+        searchContactInputEl.addEventListener('input', filterAndRenderContacts);
+
+        // Evento de clique no botão de voltar (em mobile, na barra lateral)
+        backButtonEl.addEventListener('click', showSidebar);
+
+        // Eventos do Modal de Perfil/Configurações
+        profileButtonEl.addEventListener('click', openProfileModal); // Listener para o novo botão de perfil
+        cancelProfileButtonEl.addEventListener('click', closeSettingsModal); // Botão cancelar no modal de perfil
+        saveProfileButtonEl.addEventListener('click', saveProfileSettings); // Botão salvar no modal de perfil
+
+        // Fecha o modal clicando fora dele
+        settingsModalOverlayEl.addEventListener('click', function(event) {
+            if (event.target === settingsModalOverlayEl) {
+                closeSettingsModal();
+            }
+        });
+
+        // Evento de clique no botão "Convidar Novo Usuário"
+        inviteContactButtonEl.addEventListener('click', generateInviteLink);
+
+        // Evento de clique no botão de Cadastro
+        registerButtonEl.addEventListener('click', registerUser);
+
+         // Permite cadastrar pressionando Enter nos campos do formulário
+        const registrationInputs = registrationScreenEl.querySelectorAll('.registration-form input');
+        registrationInputs.forEach(input => {
+            input.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    registerUser();
+                }
+            });
+        });
+
+
+        // --- Inicialização ---
+
+        // Carrega o estado do localStorage e processa a URL ao carregar a página
+        // A função processUrlParams agora decide qual tela mostrar (cadastro ou chat)
+        processUrlParams();
+
+    </script>
+</body>
+</html>
