@@ -577,64 +577,70 @@
         // Repertório expandido de frases para respostas simuladas
         const responseRepertoire = {
             greeting: [
-                "Olá!", "Oi!", "E aí!", "Tudo bem?", "Como vai?", "Oi, tudo certo?", "Saudações!", "Fala!", "Opa!", "E aí, tudo joia?", "Olá, como posso ajudar?", "Oi, tudo tranquilo por aqui?"
+                "Olá!", "Oi!", "E aí!", "Tudo bem?", "Como vai?", "Oi, tudo certo?", "Saudações!", "Fala!", "Opa!", "E aí, tudo joia?", "Olá, como posso ajudar?", "Oi, tudo tranquilo por aqui?", "Bom dia!", "Boa tarde!", "Boa noite!", "Que bom te ver online!", "Olá! Como estão as coisas?"
             ],
             howAreYou: [
-                "Estou bem, obrigado por perguntar!", "Tudo tranquilo por aqui.", "Indo bem.", "Estou ótimo!", "Tudo certo por aqui.", "Muito bem, e você?", "Aqui tudo joia!", "Na paz, e você?", "Estou ótimo, e você?", "Tudo nos conformes, e com você?", "Bem por aqui, obrigado!"
+                "Estou bem, obrigado por perguntar!", "Tudo tranquilo por aqui.", "Indo bem.", "Estou ótimo!", "Tudo certo por aqui.", "Muito bem, e você?", "Aqui tudo joia!", "Na paz, e você?", "Estou ótimo, e você?", "Tudo nos conformes, e com você?", "Bem por aqui, obrigado!", "Estou bem, e as novidades?", "Tudo tranquilo, e com você?", "Estou ótimo, pronto para o que precisar!"
             ],
             meeting: [
-                "Claro, podemos marcar.", "Que dia e hora seria bom?", "Tenho a tarde livre.", "Confirme o horário.", "Podemos agendar.", "Quando você estaria disponível?", "Vamos combinar algo.", "Que tal amanhã?", "Me diga um horário que funcione para você.", "Podemos alinhar nossas agendas.", "Que dia é melhor para você?", "Estou com alguns horários livres na semana que vem."
+                "Claro, podemos marcar.", "Que dia e hora seria bom?", "Tenho a tarde livre.", "Confirme o horário.", "Podemos agendar.", "Quando você estaria disponível?", "Vamos combinar algo.", "Que tal amanhã?", "Me diga um horário que funcione para você.", "Podemos alinhar nossas agendas.", "Que dia é melhor para você?", "Estou com alguns horários livres na semana que vem.", "Podemos nos encontrar?", "Que tal um café para discutir isso?", "Estou aberto a sugestões de horário.", "Vamos marcar para breve."
             ],
             file: [
-                "Ok, estou aguardando o arquivo!", "Pode enviar o documento.", "Recebi o arquivo, obrigado!", "Certo, vou dar uma olhada no relatório.", "Assim que receber, te aviso.", "Obrigado por enviar o arquivo.", "O arquivo chegou!", "Vou analisar o documento.", "Pode me mandar o anexo.", "Recebi o anexo.", "Obrigado pelo documento.", "Vou baixar o arquivo agora."
+                "Ok, estou aguardando o arquivo!", "Pode enviar o documento.", "Recebi o arquivo, obrigado!", "Certo, vou dar uma olhada no relatório.", "Assim que receber, te aviso.", "Obrigado por enviar o arquivo.", "O arquivo chegou!", "Vou analisar o documento.", "Pode me mandar o anexo.", "Recebi o anexo.", "Obrigado pelo documento.", "Vou baixar o arquivo agora.", "O arquivo foi recebido com sucesso.", "Estou abrindo o documento.", "Parece que o arquivo veio.", "Obrigado por compartilhar o arquivo."
             ],
             help: [
-                "Posso ajudar!", "Me diga o que precisa.", "Estou aqui para ajudar.", "Qual a questão?", "Em que posso ser útil?", "Pode perguntar!", "Estou à disposição.", "Conta comigo!", "No que posso te dar uma força?", "Qual a sua dúvida?", "Pode me explicar melhor?", "Estou pronto para ajudar."
+                "Posso ajudar!", "Me diga o que precisa.", "Estou aqui para ajudar.", "Qual a questão?", "Em que posso ser útil?", "Pode perguntar!", "Estou à disposição.", "Conta comigo!", "No que posso te dar uma força?", "Qual a sua dúvida?", "Pode me explicar melhor?", "Estou pronto para ajudar.", "Como posso te auxiliar?", "Me diga o que está acontecendo.", "Vou tentar resolver isso para você.", "Estou aqui para o que precisar."
             ],
             thanks: [
-                "De nada! 😊", "Por nada!", "Disponha!", "Que bom que pude ajudar!", "Imagina!", "Sem problemas!", "Foi um prazer ajudar!", "Qualquer coisa, é só chamar.", "Não há de quê.", "Fico feliz em ajudar!", "À vontade!", "Sempre que precisar!"
+                "De nada! 😊", "Por nada!", "Disponha!", "Que bom que pude ajudar!", "Imagina!", "Sem problemas!", "Foi um prazer ajudar!", "Qualquer coisa, é só chamar.", "Não há de quê.", "Fico feliz em ajudar!", "À vontade!", "Sempre que precisar!", "Que bom que deu certo!", "Disponha sempre!", "Foi fácil ajudar!"
             ],
             farewell: [
-                "Até logo!", "Tchau, tchau!", "Nos falamos!", "Até a próxima!", "Um abraço!", "Até mais!", "Fui!", "A gente se fala!", "Tenha um bom dia/tarde/noite!", "Até breve!", "Tchau!", "Vou nessa!"
+                "Até logo!", "Tchau, tchau!", "Nos falamos!", "Até a próxima!", "Um abraço!", "Até mais!", "Fui!", "A gente se fala!", "Tenha um bom dia/tarde/noite!", "Até breve!", "Tchau!", "Vou nessa!", "Até mais tarde!", "Bom descanso!", "Fique bem!"
             ],
             confirmation: [
-                "Ótimo!", "Perfeito!", "Combinado!", "Entendido!", "Certo!", "Concordo!", "Isso!", "Beleza!", "Fechado!", "Confirmado!", "Exato!", "Certamente.", "Sem dúvida!", "Com certeza!", "Isso aí!", "Pode apostar!"
+                "Ótimo!", "Perfeito!", "Combinado!", "Entendido!", "Certo!", "Concordo!", "Isso!", "Beleza!", "Fechado!", "Confirmado!", "Exato!", "Certamente.", "Sem dúvida!", "Com certeza!", "Isso aí!", "Pode apostar!", "De acordo!", "Concordo plenamente!", "É isso mesmo!", "Perfeito, vamos em frente!"
             ],
             negation: [
-                "Ah, entendi.", "Sem problemas.", "Ok, talvez na próxima.", "Compreendo.", "Entendido, sem fazer isso então.", "Não será possível.", "Infelizmente, não.", "Que pena.", "Não dá para fazer isso.", "Não concordo com isso.", "Acho que não é o caso."
+                "Ah, entendi.", "Sem problemas.", "Ok, talvez na próxima.", "Compreendo.", "Entendido, sem fazer isso então.", "Não será possível.", "Infelizmente, não.", "Que pena.", "Não dá para fazer isso.", "Não concordo com isso.", "Acho que não é o caso.", "Não é bem assim.", "Isso não vai funcionar.", "Melhor não."
             ],
             general: [
-                "Certo.", "Ok.", "Entendi.", "Hmm.", "Interessante.", "Legal!", "Bom saber.", "Pode crer.", "Faz sentido.", "Sim, sim.", "Entendido.", "Ok, prossiga.", "Continuando...", "E então?", "O que mais?", "Pensando aqui...", "Deixa eu ver...", "Um momento...", "Estou analisando.", "Processando...", "Aguarde um pouco."
+                "Certo.", "Ok.", "Entendi.", "Hmm.", "Interessante.", "Legal!", "Bom saber.", "Pode crer.", "Faz sentido.", "Sim, sim.", "Entendido.", "Ok, prossiga.", "Continuando...", "E então?", "O que mais?", "Pensando aqui...", "Deixa eu ver...", "Um momento...", "Estou analisando.", "Processando...", "Aguarde um pouco.", "Faz sentido o que você disse.", "Estou acompanhando.", "Pode continuar.", "Estou ouvindo.", "Anotado.", "Entendido perfeitamente."
             ],
             question: [
-                "O que você acha?", "Como podemos fazer?", "Alguma ideia?", "E sobre...?", "Você já viu isso?", "Qual o próximo passo?", "Como está indo?", "Alguma novidade?", "O que me diz?", "Qual a sua opinião?", "Tem alguma sugestão?", "E agora?", "O que faremos?", "Alguma pista?", "Você sabe algo sobre isso?"
+                "O que você acha?", "Como podemos fazer?", "Alguma ideia?", "E sobre...?", "Você já viu isso?", "Qual o próximo passo?", "Como está indo?", "Alguma novidade?", "O que me diz?", "Qual a sua opinião?", "Tem alguma sugestão?", "E agora?", "O que faremos?", "Alguma pista?", "Você sabe algo sobre isso?", "O que pensa a respeito?", "Qual a sua proposta?", "Como proceder agora?", "Podemos seguir com isso?"
             ],
             availability: [
-                "Estou livre agora.", "Tenho um tempo mais tarde.", "Estou um pouco ocupado no momento.", "Me avise quando estiver pronto.", "Posso falar agora.", "Estou disponível.", "Tenho uns minutos.", "Agora dá.", "Mais tarde fica melhor.", "Estou livre para conversar.", "Posso te atender em breve.", "Me chame quando puder."
+                "Estou livre agora.", "Tenho um tempo mais tarde.", "Estou um pouco ocupado no momento.", "Me avise quando estiver pronto.", "Posso falar agora.", "Estou disponível.", "Tenho uns minutos.", "Agora dá.", "Mais tarde fica melhor.", "Estou livre para conversar.", "Posso te atender em breve.", "Me chame quando puder.", "Estou com a agenda livre.", "Tenho disponibilidade.", "Posso te encaixar aqui."
             ],
             agreement: [
-                "Concordo.", "Isso mesmo.", "Perfeito.", "Sem dúvida.", "Estamos alinhados.", "Exato!", "Pensamos igual.", "Totalmente de acordo.", "É bem por aí.", "Assino embaixo!", "Concordo plenamente.", "Você tem razão."
+                "Concordo.", "Isso mesmo.", "Perfeito.", "Sem dúvida.", "Estamos alinhados.", "Exato!", "Pensamos igual.", "Totalmente de acordo.", "É bem por aí.", "Assino embaixo!", "Concordo plenamente.", "Você tem razão.", "Estamos na mesma página.", "Compartilho da mesma opinião.", "Sim, concordo totalmente."
             ],
             disagreement: [
-                "Não tenho certeza.", "Talvez não seja a melhor ideia.", "Precisamos pensar melhor.", "Tenho outro ponto de vista.", "Não vejo bem assim.", "Discordo um pouco.", "Não concordo totalmente.", "Podemos discutir isso.", "Tenho minhas dúvidas.", "Acho que não funciona assim.", "Vamos analisar melhor."
+                "Não tenho certeza.", "Talvez não seja a melhor ideia.", "Precisamos pensar melhor.", "Tenho outro ponto de vista.", "Não vejo bem assim.", "Discordo um pouco.", "Não concordo totalmente.", "Podemos discutir isso.", "Tenho minhas dúvidas.", "Acho que não funciona assim.", "Vamos analisar melhor.", "Não vejo por esse lado.", "Tenho uma ressalva.", "Não estou convencido."
             ],
              emotion_positive: [
-                 "Que bom!", "Fico feliz!", "Excelente!", "Maravilha!", "Que notícia ótima!", "Adorei!", "Fantástico!", "Incrível!", "Muito bom!", "Que alívio!"
+                 "Que bom!", "Fico feliz!", "Excelente!", "Maravilha!", "Que notícia ótima!", "Adorei!", "Fantástico!", "Incrível!", "Muito bom!", "Que alívio!", "Estou animado!", "Que beleza!", "Sensacional!", "Muito feliz com isso!", "Que maravilha!"
              ],
              emotion_negative: [
-                 "Que pena.", "Que chato.", "Sinto muito.", "Puxa vida.", "Que complicado.", "Que notícia ruim.", "Isso é triste.", "Lamento por isso."
+                 "Que pena.", "Que chato.", "Sinto muito.", "Puxa vida.", "Que complicado.", "Que notícia ruim.", "Isso é triste.", "Lamento por isso.", "Que situação difícil.", "Fiquei chateado.", "Que azar."
              ],
              suggestion: [
-                 "Que tal se fizermos...?", "Podemos tentar...", "Sugiro que...", "Minha ideia é...", "Que acha de...?", "Uma sugestão seria...", "Podemos considerar...", "Recomendo que...", "Que tal esta abordagem?"
+                 "Que tal se fizermos...?", "Podemos tentar...", "Sugiro que...", "Minha ideia é...", "Que acha de...?", "Uma sugestão seria...", "Podemos considerar...", "Recomendo que...", "Que tal esta abordagem?", "Minha proposta é...", "Pensei em algo diferente.", "Que tal invertermos a ordem?"
              ],
              inquiry: [ // Perguntas gerais
-                 "O que aconteceu?", "Como foi?", "Alguma novidade?", "E aí?", "O que me conta?", "Tudo certo por aí?", "Como estão as coisas?"
+                 "O que aconteceu?", "Como foi?", "Alguma novidade?", "E aí?", "O que me conta?", "Tudo certo por aí?", "Como estão as coisas?", "O que você tem feito?", "Alguma notícia?", "Como está o projeto?", "E a vida?", "Tudo tranquilo?"
              ],
              acknowledgement: [ // Reconhecimento simples
-                 "Ah, sim.", "Entendi.", "Ok.", "Certo.", "Compreendo.", "Saquei."
+                 "Ah, sim.", "Entendi.", "Ok.", "Certo.", "Compreendo.", "Saquei.", "Hmm, entendi.", "Faz sentido.", "Tá.", "Beleza."
+             ],
+             follow_up: [ // Frases de acompanhamento ou transição
+                 "E depois?", "O que aconteceu em seguida?", "Qual o próximo passo?", "Como podemos continuar?", "O que faremos agora?", "Alguma atualização?", "Conte-me mais.", "Prossiga."
+             ],
+             casual: [ // Frases casuais
+                 "Tudo bem por aqui.", "Dia corrido.", "Pausa para um café?", "Fim de semana chegando!", "Que calor/frio!", "Nada de novo.", "Só na correria.", "Relaxando um pouco."
              ],
              random: [ // Frases aleatórias para variar
-                "Que interessante!", "Bom dia/tarde/noite!", "Espero que esteja tudo bem.", "Recebi sua mensagem.", "Estou pensando sobre isso.", "Parece bom.", "Vamos ver.", "Combinado!", "Ok, pode ser.", "Entendido, obrigado!", "Estou por aqui se precisar.", "Tudo certo.", "Sem novidades por aqui.", "Dia corrido.", "Pausa para um café?", "Como está o tempo por aí?", "Algum plano para o fim de semana?", "Notícias?", "Novidades?"
+                "Que interessante!", "Espero que esteja tudo bem.", "Recebi sua mensagem.", "Estou pensando sobre isso.", "Parece bom.", "Vamos ver.", "Combinado!", "Ok, pode ser.", "Entendido, obrigado!", "Estou por aqui se precisar.", "Tudo certo.", "Sem novidades por aqui.", "Como está o tempo por aí?", "Algum plano para o fim de semana?", "Notícias?", "Novidades?", "Curioso para saber mais.", "Isso me fez pensar...", "Que coincidência!", "Pequeno mundo!"
              ]
         };
 
