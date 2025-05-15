@@ -104,6 +104,35 @@
             /* Adiciona um "bico" na bolha recebida */
             border-bottom-left-radius: 2px;
         }
+         /* Estilo específico para bolhas de arquivo */
+        .message-bubble.file {
+             background-color: #d1fae5; /* Verde claro para arquivos */
+             color: #065f46; /* Texto verde escuro */
+             border: 1px solid #a7f3d0;
+        }
+         .message-bubble.file .file-info {
+             display: flex;
+             align-items: center;
+             font-weight: 500;
+         }
+         .message-bubble.file .file-icon {
+             margin-right: 8px;
+             color: #065f46;
+         }
+         .message-bubble.file .file-name {
+             flex-grow: 1;
+             overflow: hidden;
+             text-overflow: ellipsis;
+             white-space: nowrap;
+         }
+         .message-bubble.file .file-size {
+             font-size: 0.75rem;
+             color: #10b981;
+             margin-left: 8px;
+             flex-shrink: 0;
+         }
+
+
         /* Estilos para a área de input de chat */
         .chat-input input {
             border-radius: 20px; /* Input mais arredondado */
@@ -447,7 +476,8 @@
 
             <div class="p-4 border-t border-gray-300 bg-gray-50">
                 <div class="flex items-center space-x-3 chat-input">
-                    <button class="p-2 text-gray-500 hover:text-blue-500" title="Anexar arquivo">
+                    <input type="file" id="file-input" multiple class="hidden">
+                    <button class="p-2 text-gray-500 hover:text-blue-500" id="attach-button" title="Anexar arquivo">
                         <i class="fas fa-paperclip fa-lg"></i>
                     </button>
                     <input type="text" id="message-input" placeholder="Digite sua mensagem..." class="flex-grow p-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow" disabled>
@@ -740,9 +770,10 @@
         const saveProfileButtonEl = document.getElementById('save-profile-button'); // Botão salvar no perfil
         const cancelProfileButtonEl = document.getElementById('cancel-profile-button'); // Botão cancelar no modal de perfil
 
-
-        // Elementos do Convite
+        // Elementos do Convite e Anexo
         const inviteContactButtonEl = document.getElementById('invite-contact-button');
+        const attachButtonEl = document.getElementById('attach-button'); // Botão de anexar
+        const fileInputEl = document.getElementById('file-input'); // Input de arquivo oculto
 
 
         // --- Variáveis de Estado ---
@@ -818,12 +849,62 @@
                  // Determina o alinhamento e a cor da bolha com base no tipo (sent/received)
                 messageDiv.className = `flex ${msg.type === 'sent' ? 'justify-end' : 'justify-start'} mb-2`;
 
-                messageDiv.innerHTML = `
-                    <div class="message-bubble ${msg.type}">
-                        <p class="text-sm">${msg.text}</p>
-                        <p class="text-xs ${msg.type === 'sent' ? 'text-blue-200' : 'text-gray-400'} mt-1 text-right">${msg.time}</p>
-                    </div>
-                `;
+                let messageContent = '';
+
+                // Verifica se a mensagem é um arquivo
+                if (msg.file) {
+                     const file = msg.file;
+                     let fileIconClass = 'fas fa-file'; // Ícone genérico
+                     if (file.type.startsWith('image/')) {
+                         fileIconClass = 'fas fa-image';
+                     } else if (file.type.startsWith('video/')) {
+                         fileIconClass = 'fas fa-video';
+                     } else if (file.type === 'application/pdf') {
+                         fileIconClass = 'fas fa-file-pdf';
+                     } else if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' || file.type === 'application/msword') {
+                         fileIconClass = 'fas fa-file-word';
+                     } else if (file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' || file.type === 'application/vnd.ms-excel') {
+                         fileIconClass = 'fas fa-file-excel';
+                     } else if (file.type === 'application/vnd.openxmlformats-officedocument.presentationml.presentation' || file.type === 'application/vnd.ms-powerpoint') {
+                         fileIconClass = 'fas fa-file-powerpoint';
+                     }
+
+
+                     // Função para formatar o tamanho do arquivo
+                     const formatBytes = (bytes, decimals = 2) => {
+                        if (bytes === 0) return '0 Bytes';
+                        const k = 1024;
+                        const dm = decimals < 0 ? 0 : decimals;
+                        const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+                        const i = Math.floor(Math.log(bytes) / Math.log(k));
+                        return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+                     };
+
+
+                    messageContent = `
+                        <div class="message-bubble file ${msg.type}">
+                            <div class="file-info">
+                                <i class="${fileIconClass} file-icon"></i>
+                                <span class="file-name">${file.name}</span>
+                            </div>
+                            <p class="file-size">${formatBytes(file.size)}</p>
+                        </div>
+                    `;
+                     // Adiciona a classe 'sent' ou 'received' na div externa para alinhamento
+                    messageDiv.className += ` ${msg.type}`;
+
+                } else {
+                    // Mensagem de texto normal
+                    messageContent = `
+                        <div class="message-bubble ${msg.type}">
+                            <p class="text-sm">${msg.text}</p>
+                            <p class="text-xs ${msg.type === 'sent' ? 'text-blue-200' : 'text-gray-400'} mt-1 text-right">${msg.time}</p>
+                        </div>
+                    `;
+                }
+
+
+                messageDiv.innerHTML = messageContent;
                 messageListEl.appendChild(messageDiv);
             });
             scrollToBottom(); // Rola para a última mensagem
@@ -1043,41 +1124,54 @@
                 showChatScreen();
                 updateUserStatusIndicator(); // Atualiza o indicador de status do usuário
 
-                // Processa o link de convite de usuário, SE o usuário já está cadastrado E o inviteUserId está na URL
-                // NOTA: A lógica de adicionar o contato ao usuário RECÉM-CADASTRADO foi movida para registerUser.
-                // Esta parte só adicionaria o contato se o usuário JÁ ESTIVESSE CADASTRADO e abrisse o link.
-                // Vamos manter a lógica de adicionar o contato SOMENTE no momento do cadastro para simplificar a simulação.
-                // Portanto, esta seção de processamento de inviteUserId para usuários JÁ CADASTRADOS pode ser removida
-                // ou modificada para apenas exibir uma mensagem.
-                // Por enquanto, vamos deixar a lógica principal de convite acontecer no registerUser.
+                // --- Lógica para adicionar novos contatos ao usuário logado ---
+                // Itera sobre todos os usuários potenciais
+                simulatedBackend.allPotentialUsers.forEach(potentialUser => {
+                     // Verifica se não é o usuário logado E se não está já na lista de contatos
+                    const isCurrentUser = simulatedBackend.currentUser && potentialUser.id === simulatedBackend.currentUser.id;
+                    const isAlreadyContact = simulatedBackend.contacts.some(contact => contact.id === potentialUser.id);
 
-                // Agora renderiza a lista de contatos (incluindo o novo, se adicionado via convite ANTERIORMENTE)
-                filterAndRenderContacts();
+                    if (!isCurrentUser && !isAlreadyContact) {
+                         // Simula a adição de um novo contato "descoberto" (alguém que se cadastrou)
+                         const newContact = {
+                             id: potentialUser.id,
+                             name: potentialUser.name,
+                             avatar: potentialUser.avatar,
+                             lastMessage: 'Novo usuário!', // Mensagem padrão para novo contato
+                             timestamp: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+                             unread: 0, // Começa sem mensagens não lidas
+                             online: potentialUser.online // Simula o status online
+                         };
+                         simulatedBackend.contacts.push(newContact);
+                         allContacts.push(newContact); // Mantém a lista local sincronizada
+                         console.log(`Novo usuário ${potentialUser.name} adicionado aos contatos do usuário logado.`);
+                    }
+                });
+                // Salva a lista de contatos atualizada (com os novos) no localStorage
+                saveStateToLocalStorage();
+                // --- Fim da lógica de adição de novos contatos ---
 
-                // Processa o link de chat, se existir (DEPOIS de carregar/adicionar contatos)
+
+                // Se houver um chatId na URL, tenta abrir o chat
                 if (chatIdFromUrl) {
                     const contactId = parseInt(chatIdFromUrl);
-                    // Busca na lista allContacts (que agora inclui contatos do localStorage)
                     const contactToOpen = allContacts.find(c => c.id === contactId);
-
                     if (contactToOpen) {
-                         // Usa setTimeout para garantir que a renderização inicial já ocorreu
                         setTimeout(() => {
-                             selectChat(contactToOpen.id);
-                             // Limpa o parâmetro chatId da URL após abrir (opcional)
-                             // window.history.replaceState({}, document.title, window.location.pathname);
+                            selectChat(contactToOpen.id);
                         }, 100);
                     } else {
                         console.warn(`Contato com ID ${chatIdFromUrl} (da URL) não encontrado.`);
-                         // Limpa o parâmetro chatId da URL se não encontrado (opcional)
-                         // window.history.replaceState({}, document.title, window.location.pathname);
                     }
                 }
-                 // Se não houver chatId na URL, a lista de contatos já foi renderizada acima
+
+                // Renderiza a lista de contatos (agora incluindo os novos contatos adicionados acima)
+                filterAndRenderContacts();
+
             } else {
                 // Usuário não cadastrado, mostra a tela de cadastro
                 showRegistrationScreen();
-                 // Se houver um inviteUserId na URL E o usuário NÃO ESTÁ CADASTRADO, armazena o ID do convidante.
+                 // Se houver um inviteUserId na URL E o usuário NÃO ESTÁ CADASTRO, armazena o ID do convidante.
                  if (inviteUserIdFromUrl) {
                      invitingUserIdOnLoad = parseInt(inviteUserIdFromUrl);
                      console.log(`InviteUserId ${invitingUserIdOnLoad} detectado. Será processado após o cadastro.`);
@@ -1208,7 +1302,9 @@
             }
 
             // Simula a criação de um novo usuário com um ID único (baseado no timestamp para simulação)
-            const newUserId = Date.now(); // ID baseado no timestamp atual
+            // Usamos um ID baseado no timestamp + um número aleatório para tentar evitar colisões
+            // em testes rápidos, embora em um sistema real um backend geraria IDs únicos.
+            const newUserId = Date.now() + Math.floor(Math.random() * 1000);
 
             const newUser = {
                 id: newUserId, // ID único para o usuário atual
@@ -1240,17 +1336,13 @@
                          online: invitingUser.online
                      };
                      simulatedBackend.contacts.push(newContact);
-                     // Não precisamos atualizar allContacts aqui imediatamente, pois filterAndRenderContacts será chamado logo
-                     console.log(`Usuário ${invitingUser.name} adicionado aos contatos do novo usuário.`);
+                     // allContacts será atualizado antes de renderizar
+                     console.log(`Usuário ${invitingUser.name} (ID: ${invitingUserId}) adicionado aos contatos do novo usuário (ID: ${newUserId}).`);
 
-                     // Opcional: Adicionar o novo usuário à lista de contatos do convidante?
-                     // Em um app real, isso seria uma ação no backend que notificaria o convidante.
-                     // Nesta simulação, o convidante verá o novo contato ao recarregar a página,
-                     // pois o novo usuário (com seu ID gerado) não existia na lista allPotentialUsers
-                     // do convidante antes, mas agora pode ser "encontrado" ao processar o link
-                     // (embora a lógica atual só adicione o convidante ao novo usuário).
-                     // Para uma simulação mais completa, precisaríamos de uma forma de atualizar o localStorage do convidante.
-                     // Por enquanto, a adição unilateral (convidante -> novo usuário) é suficiente para demonstrar o fluxo básico.
+                     // Em um sistema real, aqui o backend também adicionaria o novo usuário
+                     // à lista de contatos do convidante. Nesta simulação, a lógica
+                     // em processUrlParams para usuários já logados fará essa "descoberta"
+                     // na próxima vez que a página do convidante carregar/atualizar.
 
                  } else {
                      console.warn(`Usuário convidante com ID ${invitingUserId} não encontrado na lista potencial durante o cadastro.`);
@@ -1259,6 +1351,11 @@
                  invitingUserIdOnLoad = null;
             }
              // *** Fim da Lógica de Processamento do Convite no Cadastro ***
+
+             // *** Adiciona o NOVO usuário à lista de allPotentialUsers para que outros possam encontrá-lo ***
+             // Isso simula que o novo usuário agora existe no "diretório" do sistema.
+             simulatedBackend.allPotentialUsers.push(newUser);
+             console.log(`Novo usuário (ID: ${newUserId}) adicionado à lista de allPotentialUsers.`);
 
 
             saveStateToLocalStorage(); // Salva o novo usuário e a lista de contatos (potencialmente com o convidante)
@@ -1269,7 +1366,7 @@
             showChatScreen();
             updateUserStatusIndicator(); // Atualiza o indicador de status do usuário
              // Re-renderiza a lista de contatos (que agora pode conter o convidante)
-             allContacts = [...simulatedBackend.contacts]; // Atualiza a variável local
+             allContacts = [...simulatedBackend.contacts]; // Atualiza a variável local para a lista do NOVO usuário
              filterAndRenderContacts();
 
              // Opcional: Limpar os campos do formulário após o cadastro
@@ -1279,6 +1376,59 @@
              emailInputEl.value = '';
              registrationErrorMessageEl.style.display = 'none';
              registrationErrorMessageEl.textContent = '';
+        }
+
+        // Função para lidar com a seleção de arquivos
+        function handleFileSelect(event) {
+            const files = event.target.files; // Obtém a lista de arquivos selecionados
+
+            if (!files || files.length === 0) {
+                return; // Sai se nenhum arquivo foi selecionado
+            }
+
+            if (currentChatId === null) {
+                 showMessageBox("Por favor, selecione um contato para enviar arquivos.");
+                 // Limpa o input de arquivo para permitir a seleção novamente
+                 fileInputEl.value = '';
+                 return;
+            }
+
+
+            // Processa cada arquivo selecionado
+            for (const file of files) {
+                 // Simula o envio do arquivo como uma mensagem
+                 const fileMessage = {
+                     senderId: simulatedBackend.currentUser.id, // Usuário atual
+                     file: { // Adiciona um objeto 'file' com detalhes
+                         name: file.name,
+                         type: file.type,
+                         size: file.size
+                         // Em um app real, aqui teríamos a URL do arquivo após o upload
+                     },
+                     time: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+                     type: 'sent' // Mensagem enviada pelo usuário
+                 };
+
+                 // Adiciona a mensagem de arquivo à lista de mensagens atual
+                 currentChatMessages.push(fileMessage);
+
+                 // Re-renderiza as mensagens para incluir o arquivo simulado
+                 renderMessages(currentChatMessages);
+
+                 // Opcional: Atualizar a última mensagem na lista de contatos para indicar o arquivo
+                 const contact = allContacts.find(c => c.id === currentChatId);
+                 if (contact) {
+                      contact.lastMessage = `Arquivo: ${file.name}`; // Exibe o nome do arquivo
+                     contact.timestamp = fileMessage.time;
+                      filterAndRenderContacts(); // Re-renderiza a lista de contatos
+                 }
+
+                 // Em um aplicativo real, aqui você faria o upload do arquivo para o backend.
+                 console.log(`Simulando envio do arquivo: ${file.name} (${file.type}, ${file.size} bytes) para o contato ${currentChatId}`);
+            }
+
+            // Limpa o input de arquivo para permitir a seleção do mesmo arquivo novamente
+            fileInputEl.value = '';
         }
 
 
@@ -1337,6 +1487,17 @@
                 }
             });
         });
+
+        // Eventos para Anexar Arquivo
+        attachButtonEl.addEventListener('click', function() {
+             // Verifica se um chat está selecionado antes de abrir o seletor de arquivo
+             if (currentChatId !== null) {
+                 fileInputEl.click(); // Simula um clique no input de arquivo oculto
+             } else {
+                 showMessageBox("Por favor, selecione um contato para enviar arquivos.");
+             }
+        });
+        fileInputEl.addEventListener('change', handleFileSelect); // Lida com a seleção de arquivos
 
 
         // --- Inicialização ---
