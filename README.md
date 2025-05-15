@@ -1343,7 +1343,7 @@
                      };
                      simulatedBackend.contacts.push(newContact);
                      // allContacts será atualizado antes de renderizar
-                     console.log(`Usuário ${invulatingUser.name} (ID: ${invitingUserId}) adicionado aos contatos do novo usuário (ID: ${newUserId}).`);
+                     console.log(`Usuário ${invitingUser.name} (ID: ${invitingUserId}) adicionado aos contatos do novo usuário (ID: ${newUserId}).`);
 
                      // Em um sistema real, aqui o backend também adicionaria o novo usuário
                      // à lista de contatos do convidante. Nesta simulação, a lógica
