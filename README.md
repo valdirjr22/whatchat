@@ -91,6 +91,7 @@
             word-wrap: break-word;
             filter: drop-shadow(0 1px 0.5px rgba(0,0,0,0.1)); /* Sombra sutil */
             transition: transform 0.2s ease-in-out; /* Animação ao aparecer */
+            position: relative; /* Necessário para posicionar o ícone de lixeira */
         }
         .message-bubble.sent {
             background-color: #3b82f6; /* Azul para mensagens enviadas */
@@ -133,6 +134,27 @@
              margin-left: 8px;
              flex-shrink: 0;
          }
+        /* Estilo para o ícone de lixeira */
+        .delete-message-icon {
+            position: absolute;
+            bottom: 5px; /* Ajusta a posição vertical */
+            cursor: pointer;
+            font-size: 0.7rem; /* Tamanho menor */
+            opacity: 0.6; /* Levemente transparente por padrão */
+            transition: opacity 0.2s ease-in-out, color 0.2s ease-in-out;
+        }
+        .message-bubble.sent .delete-message-icon {
+            left: -15px; /* Posiciona à esquerda da bolha enviada */
+            color: rgba(255, 255, 255, 0.8); /* Cor clara para contraste no fundo azul */
+        }
+        .message-bubble.received .delete-message-icon {
+            right: -15px; /* Posiciona à direita da bolha recebida */
+            color: rgba(0, 0, 0, 0.4); /* Cor escura para contraste no fundo cinza */
+        }
+        .delete-message-icon:hover {
+            opacity: 1.0; /* Totalmente opaco no hover */
+            color: #dc2626; /* Cor vermelha no hover */
+        }
 
 
         /* Estilos para a área de input de chat */
@@ -577,70 +599,79 @@
         // Repertório expandido de frases para respostas simuladas
         const responseRepertoire = {
             greeting: [
-                "Olá!", "Oi!", "E aí!", "Tudo bem?", "Como vai?", "Oi, tudo certo?", "Saudações!", "Fala!", "Opa!", "E aí, tudo joia?", "Olá, como posso ajudar?", "Oi, tudo tranquilo por aqui?", "Bom dia!", "Boa tarde!", "Boa noite!", "Que bom te ver online!", "Olá! Como estão as coisas?"
+                "Olá!", "Oi!", "E aí!", "Tudo bem?", "Como vai?", "Oi, tudo certo?", "Saudações!", "Fala!", "Opa!", "E aí, tudo joia?", "Olá, como posso ajudar?", "Oi, tudo tranquilo por aqui?", "Bom dia!", "Boa tarde!", "Boa noite!", "Que bom te ver online!", "Olá! Como estão as coisas?", "E aí! Tudo bem por aí?", "Oi! Alguma novidade?", "Saudações! Como vai o dia?"
             ],
             howAreYou: [
-                "Estou bem, obrigado por perguntar!", "Tudo tranquilo por aqui.", "Indo bem.", "Estou ótimo!", "Tudo certo por aqui.", "Muito bem, e você?", "Aqui tudo joia!", "Na paz, e você?", "Estou ótimo, e você?", "Tudo nos conformes, e com você?", "Bem por aqui, obrigado!", "Estou bem, e as novidades?", "Tudo tranquilo, e com você?", "Estou ótimo, pronto para o que precisar!"
+                "Estou bem, obrigado por perguntar!", "Tudo tranquilo por aqui.", "Indo bem.", "Estou ótimo!", "Tudo certo por aqui.", "Muito bem, e você?", "Aqui tudo joia!", "Na paz, e você?", "Estou ótimo, e você?", "Tudo nos conformes, e com você?", "Bem por aqui, obrigado!", "Estou bem, e as novidades?", "Tudo tranquilo, e com você?", "Estou ótimo, pronto para o que precisar!", "Estou bem, na correria de sempre.", "Tudo certo, meio atarefado.", "Estou bem, e como você está se sentindo?", "Aqui tudo ótimo, e com você, tudo em ordem?"
             ],
             meeting: [
-                "Claro, podemos marcar.", "Que dia e hora seria bom?", "Tenho a tarde livre.", "Confirme o horário.", "Podemos agendar.", "Quando você estaria disponível?", "Vamos combinar algo.", "Que tal amanhã?", "Me diga um horário que funcione para você.", "Podemos alinhar nossas agendas.", "Que dia é melhor para você?", "Estou com alguns horários livres na semana que vem.", "Podemos nos encontrar?", "Que tal um café para discutir isso?", "Estou aberto a sugestões de horário.", "Vamos marcar para breve."
+                "Claro, podemos marcar.", "Que dia e hora seria bom?", "Tenho a tarde livre.", "Confirme o horário.", "Podemos agendar.", "Quando você estaria disponível?", "Vamos combinar algo.", "Que tal amanhã?", "Me diga um horário que funcione para você.", "Podemos alinhar nossas agendas.", "Que dia é melhor para você?", "Estou com alguns horários livres na semana que vem.", "Podemos nos encontrar?", "Que tal um café para discutir isso?", "Estou aberto a sugestões de horário.", "Vamos marcar para breve.", "Que dia e horário funcionam para você?", "Podemos marcar para quando for melhor.", "Estou flexível para agendar.", "Que tal combinarmos um call rápido?"
             ],
             file: [
-                "Ok, estou aguardando o arquivo!", "Pode enviar o documento.", "Recebi o arquivo, obrigado!", "Certo, vou dar uma olhada no relatório.", "Assim que receber, te aviso.", "Obrigado por enviar o arquivo.", "O arquivo chegou!", "Vou analisar o documento.", "Pode me mandar o anexo.", "Recebi o anexo.", "Obrigado pelo documento.", "Vou baixar o arquivo agora.", "O arquivo foi recebido com sucesso.", "Estou abrindo o documento.", "Parece que o arquivo veio.", "Obrigado por compartilhar o arquivo."
+                "Ok, estou aguardando o arquivo!", "Pode enviar o documento.", "Recebi o arquivo, obrigado!", "Certo, vou dar uma olhada no relatório.", "Assim que receber, te aviso.", "Obrigado por enviar o arquivo.", "O arquivo chegou!", "Vou analisar o documento.", "Pode me mandar o anexo.", "Recebi o anexo.", "Obrigado pelo documento.", "Vou baixar o arquivo agora.", "O arquivo foi recebido com sucesso.", "Estou abrindo o documento.", "Parece que o arquivo veio.", "Obrigado por compartilhar o arquivo.", "Confirmei o recebimento do arquivo.", "Vou dar uma olhada no documento que você enviou.", "Obrigado por me enviar o anexo.", "Arquivo recebido, valeu!"
             ],
             help: [
-                "Posso ajudar!", "Me diga o que precisa.", "Estou aqui para ajudar.", "Qual a questão?", "Em que posso ser útil?", "Pode perguntar!", "Estou à disposição.", "Conta comigo!", "No que posso te dar uma força?", "Qual a sua dúvida?", "Pode me explicar melhor?", "Estou pronto para ajudar.", "Como posso te auxiliar?", "Me diga o que está acontecendo.", "Vou tentar resolver isso para você.", "Estou aqui para o que precisar."
+                "Posso ajudar!", "Me diga o que precisa.", "Estou aqui para ajudar.", "Qual a questão?", "Em que posso ser útil?", "Pode perguntar!", "Estou à disposição.", "Conta comigo!", "No que posso te dar uma força?", "Qual a sua dúvida?", "Pode me explicar melhor?", "Estou pronto para ajudar.", "Como posso te auxiliar?", "Me diga o que está acontecendo.", "Vou tentar resolver isso para você.", "Estou aqui para o que precisar.", "Pode me dar mais detalhes sobre o problema?", "Vou investigar isso para você.", "Estou à sua disposição para ajudar.", "Como posso te dar suporte?"
             ],
             thanks: [
-                "De nada! 😊", "Por nada!", "Disponha!", "Que bom que pude ajudar!", "Imagina!", "Sem problemas!", "Foi um prazer ajudar!", "Qualquer coisa, é só chamar.", "Não há de quê.", "Fico feliz em ajudar!", "À vontade!", "Sempre que precisar!", "Que bom que deu certo!", "Disponha sempre!", "Foi fácil ajudar!"
+                "De nada! 😊", "Por nada!", "Disponha!", "Que bom que pude ajudar!", "Imagina!", "Sem problemas!", "Foi um prazer ajudar!", "Qualquer coisa, é só chamar.", "Não há de quê.", "Fico feliz em ajudar!", "À vontade!", "Sempre que precisar!", "Que bom que deu certo!", "Disponha sempre!", "Foi fácil ajudar!", "Que bom que ajudei!", "Não foi nada!", "Estou aqui para isso!", "Que bom que resolvi!"
             ],
             farewell: [
-                "Até logo!", "Tchau, tchau!", "Nos falamos!", "Até a próxima!", "Um abraço!", "Até mais!", "Fui!", "A gente se fala!", "Tenha um bom dia/tarde/noite!", "Até breve!", "Tchau!", "Vou nessa!", "Até mais tarde!", "Bom descanso!", "Fique bem!"
+                "Até logo!", "Tchau, tchau!", "Nos falamos!", "Até a próxima!", "Um abraço!", "Até mais!", "Fui!", "A gente se fala!", "Tenha um bom dia/tarde/noite!", "Até breve!", "Tchau!", "Vou nessa!", "Até mais tarde!", "Bom descanso!", "Fique bem!", "Até a próxima!", "Nos vemos por aí!", "Tchau! Se cuida!", "Até mais, bom trabalho/estudo!"
             ],
             confirmation: [
-                "Ótimo!", "Perfeito!", "Combinado!", "Entendido!", "Certo!", "Concordo!", "Isso!", "Beleza!", "Fechado!", "Confirmado!", "Exato!", "Certamente.", "Sem dúvida!", "Com certeza!", "Isso aí!", "Pode apostar!", "De acordo!", "Concordo plenamente!", "É isso mesmo!", "Perfeito, vamos em frente!"
+                "Ótimo!", "Perfeito!", "Combinado!", "Entendido!", "Certo!", "Concordo!", "Isso!", "Beleza!", "Fechado!", "Confirmado!", "Exato!", "Certamente.", "Sem dúvida!", "Com certeza!", "Isso aí!", "Pode apostar!", "De acordo!", "Concordo plenamente!", "É isso mesmo!", "Perfeito, vamos em frente!", "Confirmadíssimo!", "Entendido, pode seguir.", "Ok, combinado!", "Perfeito!"
             ],
             negation: [
-                "Ah, entendi.", "Sem problemas.", "Ok, talvez na próxima.", "Compreendo.", "Entendido, sem fazer isso então.", "Não será possível.", "Infelizmente, não.", "Que pena.", "Não dá para fazer isso.", "Não concordo com isso.", "Acho que não é o caso.", "Não é bem assim.", "Isso não vai funcionar.", "Melhor não."
+                "Ah, entendi.", "Sem problemas.", "Ok, talvez na próxima.", "Compreendo.", "Entendido, sem fazer isso então.", "Não será possível.", "Infelizmente, não.", "Que pena.", "Não dá para fazer isso.", "Não concordo com isso.", "Acho que não é o caso.", "Não é bem assim.", "Isso não vai funcionar.", "Melhor não.", "Não consigo fazer isso agora.", "Essa opção não está disponível.", "Não é a melhor ideia.", "Acho que não."
             ],
             general: [
-                "Certo.", "Ok.", "Entendi.", "Hmm.", "Interessante.", "Legal!", "Bom saber.", "Pode crer.", "Faz sentido.", "Sim, sim.", "Entendido.", "Ok, prossiga.", "Continuando...", "E então?", "O que mais?", "Pensando aqui...", "Deixa eu ver...", "Um momento...", "Estou analisando.", "Processando...", "Aguarde um pouco.", "Faz sentido o que você disse.", "Estou acompanhando.", "Pode continuar.", "Estou ouvindo.", "Anotado.", "Entendido perfeitamente."
+                "Certo.", "Ok.", "Entendi.", "Hmm.", "Interessante.", "Legal!", "Bom saber.", "Pode crer.", "Faz sentido.", "Sim, sim.", "Entendido.", "Ok, prossiga.", "Continuando...", "E então?", "O que mais?", "Pensando aqui...", "Deixa eu ver...", "Um momento...", "Estou analisando.", "Processando...", "Aguarde um pouco.", "Faz sentido o que você disse.", "Estou acompanhando.", "Pode continuar.", "Estou ouvindo.", "Anotado.", "Entendido perfeitamente.", "Acho que sim.", "Talvez.", "Pode ser.", "Vamos ver como fica.", "Estou pensando sobre isso.", "É uma boa questão.", "Preciso verificar.", "Deixe-me pensar."
             ],
             question: [
-                "O que você acha?", "Como podemos fazer?", "Alguma ideia?", "E sobre...?", "Você já viu isso?", "Qual o próximo passo?", "Como está indo?", "Alguma novidade?", "O que me diz?", "Qual a sua opinião?", "Tem alguma sugestão?", "E agora?", "O que faremos?", "Alguma pista?", "Você sabe algo sobre isso?", "O que pensa a respeito?", "Qual a sua proposta?", "Como proceder agora?", "Podemos seguir com isso?"
+                "O que você acha?", "Como podemos fazer?", "Alguma ideia?", "E sobre...?", "Você já viu isso?", "Qual o próximo passo?", "Como está indo?", "Alguma novidade?", "O que me diz?", "Qual a sua opinião?", "Tem alguma sugestão?", "E agora?", "O que faremos?", "Alguma pista?", "Você sabe algo sobre isso?", "O que pensa a respeito?", "Qual a sua proposta?", "Como proceder agora?", "Podemos seguir com isso?", "Qual a sua dúvida?", "Você entendeu?", "Ficou claro?", "Podemos avançar?", "O que sugere?", "Como podemos resolver isso?"
             ],
             availability: [
-                "Estou livre agora.", "Tenho um tempo mais tarde.", "Estou um pouco ocupado no momento.", "Me avise quando estiver pronto.", "Posso falar agora.", "Estou disponível.", "Tenho uns minutos.", "Agora dá.", "Mais tarde fica melhor.", "Estou livre para conversar.", "Posso te atender em breve.", "Me chame quando puder.", "Estou com a agenda livre.", "Tenho disponibilidade.", "Posso te encaixar aqui."
+                "Estou livre agora.", "Tenho um tempo mais tarde.", "Estou um pouco ocupado no momento.", "Me avise quando estiver pronto.", "Posso falar agora.", "Estou disponível.", "Tenho uns minutos.", "Agora dá.", "Mais tarde fica melhor.", "Estou livre para conversar.", "Posso te atender em breve.", "Me chame quando puder.", "Estou com a agenda livre.", "Tenho disponibilidade.", "Posso te encaixar aqui.", "Estou livre nos próximos minutos.", "Tenho um espaço na minha agenda.", "Posso te ligar em instantes.", "Estou disponível para uma rápida conversa."
             ],
             agreement: [
-                "Concordo.", "Isso mesmo.", "Perfeito.", "Sem dúvida.", "Estamos alinhados.", "Exato!", "Pensamos igual.", "Totalmente de acordo.", "É bem por aí.", "Assino embaixo!", "Concordo plenamente.", "Você tem razão.", "Estamos na mesma página.", "Compartilho da mesma opinião.", "Sim, concordo totalmente."
+                "Concordo.", "Isso mesmo.", "Perfeito.", "Sem dúvida.", "Estamos alinhados.", "Exato!", "Pensamos igual.", "Totalmente de acordo.", "É bem por aí.", "Assino embaixo!", "Concordo plenamente.", "Você tem razão.", "Estamos na mesma página.", "Compartilho da mesma opinião.", "Sim, concordo totalmente.", "É exatamente isso.", "Estamos em sintonia.", "Não poderia concordar mais.", "Você disse tudo."
             ],
             disagreement: [
-                "Não tenho certeza.", "Talvez não seja a melhor ideia.", "Precisamos pensar melhor.", "Tenho outro ponto de vista.", "Não vejo bem assim.", "Discordo um pouco.", "Não concordo totalmente.", "Podemos discutir isso.", "Tenho minhas dúvidas.", "Acho que não funciona assim.", "Vamos analisar melhor.", "Não vejo por esse lado.", "Tenho uma ressalva.", "Não estou convencido."
+                "Não tenho certeza.", "Talvez não seja a melhor ideia.", "Precisamos pensar melhor.", "Tenho outro ponto de vista.", "Não vejo bem assim.", "Discordo um pouco.", "Não concordo totalmente.", "Podemos discutir isso.", "Tenho minhas dúvidas.", "Acho que não funciona assim.", "Vamos analisar melhor.", "Não vejo por esse lado.", "Tenho uma ressalva.", "Não estou convencido.", "Acho que há um engano.", "Não é o que eu penso.", "Tenho uma perspectiva diferente."
             ],
              emotion_positive: [
-                 "Que bom!", "Fico feliz!", "Excelente!", "Maravilha!", "Que notícia ótima!", "Adorei!", "Fantástico!", "Incrível!", "Muito bom!", "Que alívio!", "Estou animado!", "Que beleza!", "Sensacional!", "Muito feliz com isso!", "Que maravilha!"
+                 "Que bom!", "Fico feliz!", "Excelente!", "Maravilha!", "Que notícia ótima!", "Adorei!", "Fantástico!", "Incrível!", "Muito bom!", "Que alívio!", "Estou animado!", "Que beleza!", "Sensacional!", "Muito feliz com isso!", "Que maravilha!", "Isso é ótimo!", "Excelente notícia!", "Que alegria!"
              ],
              emotion_negative: [
-                 "Que pena.", "Que chato.", "Sinto muito.", "Puxa vida.", "Que complicado.", "Que notícia ruim.", "Isso é triste.", "Lamento por isso.", "Que situação difícil.", "Fiquei chateado.", "Que azar."
+                 "Que pena.", "Que chato.", "Sinto muito.", "Puxa vida.", "Que complicado.", "Que notícia ruim.", "Isso é triste.", "Lamento por isso.", "Que situação difícil.", "Fiquei chateado.", "Que azar.", "Isso é lamentável.", "Que frustrante.", "Sinto muito em ouvir isso."
              ],
              suggestion: [
-                 "Que tal se fizermos...?", "Podemos tentar...", "Sugiro que...", "Minha ideia é...", "Que acha de...?", "Uma sugestão seria...", "Podemos considerar...", "Recomendo que...", "Que tal esta abordagem?", "Minha proposta é...", "Pensei em algo diferente.", "Que tal invertermos a ordem?"
+                 "Que tal se fizermos...?", "Podemos tentar...", "Sugiro que...", "Minha ideia é...", "Que acha de...?", "Uma sugestão seria...", "Podemos considerar...", "Recomendo que...", "Que tal esta abordagem?", "Minha proposta é...", "Pensei em algo diferente.", "Que tal invertermos a ordem?", "Uma alternativa seria...", "Que tal explorarmos essa opção?", "Minha recomendação é...", "Que tal fazermos assim?"
              ],
              inquiry: [ // Perguntas gerais
-                 "O que aconteceu?", "Como foi?", "Alguma novidade?", "E aí?", "O que me conta?", "Tudo certo por aí?", "Como estão as coisas?", "O que você tem feito?", "Alguma notícia?", "Como está o projeto?", "E a vida?", "Tudo tranquilo?"
+                 "O que aconteceu?", "Como foi?", "Alguma novidade?", "E aí?", "O que me conta?", "Tudo certo por aí?", "Como estão as coisas?", "O que você tem feito?", "Alguma notícia?", "Como está o projeto?", "E a vida?", "Tudo tranquilo?", "Como foi o seu dia?", "O que você está fazendo agora?", "Algum plano para hoje?", "O que me diz sobre...?"
              ],
              acknowledgement: [ // Reconhecimento simples
-                 "Ah, sim.", "Entendi.", "Ok.", "Certo.", "Compreendo.", "Saquei.", "Hmm, entendi.", "Faz sentido.", "Tá.", "Beleza."
+                 "Ah, sim.", "Entendi.", "Ok.", "Certo.", "Compreendo.", "Saquei.", "Hmm, entendi.", "Faz sentido.", "Tá.", "Beleza.", "Entendido.", "Ok.", "Certo.", "Compreendido."
              ],
              follow_up: [ // Frases de acompanhamento ou transição
-                 "E depois?", "O que aconteceu em seguida?", "Qual o próximo passo?", "Como podemos continuar?", "O que faremos agora?", "Alguma atualização?", "Conte-me mais.", "Prossiga."
+                 "E depois?", "O que aconteceu em seguida?", "Qual o próximo passo?", "Como podemos continuar?", "O que faremos agora?", "Alguma atualização?", "Conte-me mais.", "Prossiga.", "E aí?", "O que mais?", "E sobre aquilo?", "Vamos em frente.", "O que vem depois?"
              ],
              casual: [ // Frases casuais
-                 "Tudo bem por aqui.", "Dia corrido.", "Pausa para um café?", "Fim de semana chegando!", "Que calor/frio!", "Nada de novo.", "Só na correria.", "Relaxando um pouco."
+                 "Tudo bem por aqui.", "Dia corrido.", "Pausa para um café?", "Fim de semana chegando!", "Que calor/frio!", "Nada de novo.", "Só na correria.", "Relaxando um pouco.", "Tudo na boa.", "Sem estresse.", "Mais um dia.", "Vamos que vamos.", "Tranquilo por aqui."
+             ],
+             intensifiers: [ // Palavras ou frases para intensificar
+                 "muito", "bastante", "realmente", "totalmente", "completamente", "de verdade", "sempre", "nunca", "quase", "apenas", "só", "muito mesmo"
+             ],
+             connectors: [ // Conectores para ligar frases
+                 "e", "mas", "porém", "contudo", "então", "assim", "portanto", "além disso", "enquanto isso", "depois", "antes", "porque", "já que", "se", "quando"
+             ],
+             emojis: [ // Emojis para adicionar tom
+                 "😊", "👍", "😂", "🤔", "💡", "✅", "❌", "👋", "☕", "📅", "📄", "❓", "❗", "😉", "👍", "😅", "🙂"
              ],
              random: [ // Frases aleatórias para variar
-                "Que interessante!", "Espero que esteja tudo bem.", "Recebi sua mensagem.", "Estou pensando sobre isso.", "Parece bom.", "Vamos ver.", "Combinado!", "Ok, pode ser.", "Entendido, obrigado!", "Estou por aqui se precisar.", "Tudo certo.", "Sem novidades por aqui.", "Como está o tempo por aí?", "Algum plano para o fim de semana?", "Notícias?", "Novidades?", "Curioso para saber mais.", "Isso me fez pensar...", "Que coincidência!", "Pequeno mundo!"
+                "Que interessante!", "Espero que esteja tudo bem.", "Recebi sua mensagem.", "Estou pensando sobre isso.", "Parece bom.", "Vamos ver.", "Combinado!", "Ok, pode ser.", "Entendido, obrigado!", "Estou por aqui se precisar.", "Tudo certo.", "Sem novidades por aqui.", "Como está o tempo por aí?", "Algum plano para o fim de semana?", "Notícias?", "Novidades?", "Curioso para saber mais.", "Isso me fez pensar...", "Que coincidência!", "Pequeno mundo!", "Devo admitir...", "Para ser honesto...", "Sinceramente...", "Entre nós...", "Falando nisso...", "Por falar em...", "A propósito...", "Mudando de assunto...", "Só para constar...", "É importante notar que...", "Não se esqueça de...", "Lembre-se que...", "Pode ser útil saber...", "Só um lembrete rápido...", "Tenha em mente que...", "Vale a pena mencionar...", "Algo a considerar...", "Um ponto a pensar...", "Refletindo sobre...", "Do meu ponto de vista...", "Na minha opinião...", "Acredito que...", "Parece que...", "Tenho a impressão que...", "Me parece que...", "Pelo que entendi...", "Se não me engano...", "Corrija-me se estiver errado...", "Sei lá...", "Vai saber...", "Quem diria...", "Inacreditável!", "Impressionante!", "Surpreendente!", "Esperado.", "Previsível.", "Como imaginei.", "Sem surpresas.", "Era de se esperar.", "Nada fora do comum.", "Tudo normal por aqui.", "Rotina.", "Mais um dia na labuta.", "A vida segue.", "É isso.", "Paciência.", "Vamos em frente.", "Bola pra frente.", "Segue o jogo.", "Vida que segue.", "É assim mesmo.", "Faz parte.", "Acontece.", "Quem nunca?", "Normal.", "Comum.", "Típico.", "Característico.", "Padrão.", "Regra.", "Exceção.", "Raro.", "Incomum.", "Diferente.", "Interessante.", "Curioso.", "Peculiar.", "Estranho.", "Bizarro.", "Inesperado.", "Surpreendente.", "Chocante.", "Impressionante.", "Espetacular.", "Fantástico.", "Maravilhoso.", "Incrível.", "Excelente.", "Ótimo.", "Bom.", "Regular.", "Ruim.", "Péssimo.", "Terrível.", "Horrível.", "Lamentável.", "Triste.", "Feliz.", "Alegre.", "Contente.", "Satisfeito.", "Grato.", "Aliviado.", "Preocupado.", "Ansioso.", "Nervoso.", "Calmo.", "Tranquilo.", "Relaxado.", "Cansado.", "Esgotado.", "Com sono.", "Com fome.", "Com sede.", "Com calor.", "Com frio.", "Com pressa.", "Sem pressa.", "Com tempo.", "Sem tempo.", "Com dinheiro.", "Sem dinheiro.", "Com sorte.", "Sem sorte.", "Com razão.", "Sem razão.", "Certo.", "Errado.", "Verdadeiro.", "Falso.", "Possível.", "Impossível.", "Provável.", "Improvável.", "Necessário.", "Desnecessário.", "Importante.", "Irrelevante.", "Urgente.", "Não urgente.", "Fácil.", "Difícil.", "Simples.", "Complicado.", "Rápido.", "Lento.", "Perto.", "Longe.", "Aqui.", "Lá.", "Agora.", "Depois.", "Antes.", "Durante.", "Enquanto.", "Quando.", "Onde.", "Como.", "Por que.", "Para que.", "Quem.", "O que.", "Qual.", "Quanto.", "Quantos.", "Quais.", "Como assim?", "Por quê?", "Para quê?", "Quem é?", "O que é isso?", "Qual é?", "Quanto custa?", "Quantos são?", "Quais são?", "Como está?", "Por onde?", "Para onde?", "De onde?", "Até quando?", "Desde quando?", "Em que momento?", "De que forma?", "Com quem?", "Para quem?", "De quem?", "Sobre o que?", "A respeito de que?", "Em relação a que?", "No que diz respeito a?", "Falando sobre...", "Discutindo...", "Conversando a respeito de...", "Trocando ideias sobre...", "Pensando em...", "Refletindo sobre...", "Considerando...", "Analisando...", "Observando...", "Notando...", "Percebendo...", "Descobrindo...", "Aprendendo...", "Ensinando...", "Compartilhando...", "Trocando...", "Dando...", "Recebendo...", "Oferecendo...", "Aceitando...", "Recusando...", "Pedindo...", "Agradecendo...", "Desculpando-se...", "Cumprimentando...", "Despedindo-se...", "Apresentando...", "Introduzindo...", "Recomendando...", "Sugerindo...", "Aconselhando...", "Alertando...", "Avisando...", "Informando...", "Esclarecendo...", "Explicando...", "Detalhando...", "Resumindo...", "Concluindo...", "Iniciando...", "Terminando...", "Continuando...", "Parando...", "Começando...", "Finalizando...", "Prosseguindo...", "Interrompendo...", "Acelerando...", "Desacelerando...", "Avançando...", "Retornando...", "Indo...", "Vindo...", "Chegando...", "Saindo...", "Entrando...", "Voltando...", "Partindo...", "Ficando...", "Permanecendo...", "Esperando...", "Aguardando...", "Procurando...", "Encontrando...", "Perdendo...", "Achando...", "Olhando...", "Vendo...", "Ouvindo...", "Sentindo...", "Tocando...", "Cheirando...", "Degustando...", "Experimentando...", "Testando...", "Provando...", "Tentando...", "Conseguindo.", "Falhando.", "Vencendo.", "Perdendo.", "Ganhando.", "Gastando.", "Economizando.", "Investindo.", "Vendendo.", "Comprando.", "Alugando.", "Construindo.", "Reformando.", "Decorando.", "Limpando.", "Organizando.", "Bagunçando.", "Quebrando.", "Consertando.", "Criando.", "Destruindo.", "Fazendo.", "Desfazendo.", "Ligando.", "Desligando.", "Abrindo.", "Fechando.", "Empurrando.", "Puxando.", "Levantando.", "Sentando.", "Deitando.", "Dormindo.", "Acordando.", "Sonhando.", "Pensando.", "Refletindo.", "Meditando.", "Concentrando-se.", "Distraindo-se.", "Aprendendo.", "Estudando.", "Trabalhando.", "Descansando.", "Viajando.", "Explorando.", "Descobrindo.", "Aventurando-se.", "Arriscando-se.", "Protegendo-se.", "Defendendo-se.", "Atacando.", "Resistindo.", "Cedendo.", "Insistindo.", "Desistindo.", "Persistindo.", "Começando de novo.", "Recomeçando.", "Inovando.", "Copiando.", "Imitando.", "Criando algo novo.", "Melhorando.", "Piorando.", "Mudando.", "Mantendo.", "Transformando.", "Estacionando.", "Seguindo em frente.", "Voltando atrás.", "Acelerando o passo.", "Diminuindo o ritmo.", "Parando para pensar.", "Continuando a jornada.", "Chegando ao destino.", "Partindo para outro lugar.", "Ficando por aqui.", "Indo embora.", "Vindo para cá.", "Chegando agora.", "Saindo já.", "Entrando agora.", "Voltando depois.", "Partindo amanhã.", "Ficando mais um pouco.", "Esperando um pouco mais.", "Aguardando o momento certo.", "Procurando uma solução.", "Encontrando a resposta.", "Perdendo a paciência.", "Achando uma saída.", "Olhando ao redor.", "Vendo o que acontece.", "Ouvindo com atenção.", "Sentindo a emoção.", "Tocando a realidade.", "Cheirando o ar.", "Degustando a vida.", "Experimentando coisas novas.", "Testando os limites.", "Provando a coragem.", "Tentando ser feliz.", "Conseguindo ser você mesmo.", "Falhando em ser perfeito.", "Vencendo seus medos.", "Perdendo a vergonha.", "Ganhando confiança.", "Gastando tempo com quem importa.", "Economizando palavras.", "Investindo em si mesmo.", "Vendendo sonhos.", "Comprando ideias.", "Alugando um sorriso.", "Construindo pontes.", "Reformando conceitos.", "Decorando a alma.", "Limpando as mágoas.", "Organizando a vida.", "Bagunçando a rotina.", "Quebrando paradigmas.", "Consertando corações.", "Criando laços.", "Destruindo muros.", "Fazendo a diferença.", "Desfazendo mal-entendidos.", "Ligando pessoas.", "Desligando problemas.", "Abrindo caminhos.", "Fechando portas.", "Empurrando limites.", "Puxando oportunidades.", "Levantando a cabeça.", "Sentando para aprender.", "Deitando para sonhar.", "Dormindo em paz.", "Acordando para a vida.", "Sonhando acordado.", "Pensando alto.", "Refletindo profundamente.", "Meditando sobre o universo.", "Concentrando-se no presente.", "Distraindo-se com a beleza.", "Aprendendo com os erros.", "Estudando o sucesso.", "Trabalhando com paixão.", "Descansando a mente.", "Viajando na imaginação.", "Explorando o desconhecido.", "Descobrindo novos horizontes.", "Aventurando-se na aventura.", "Arriscando a sorte.", "Protegendo quem ama.", "Defendendo seus ideais.", "Atacando a ignorância.", "Resistindo à pressão.", "Cedendo à razão.", "Insistindo na bondade.", "Desistindo da maldade.", "Persistindo no bem."
              ]
         };
 
@@ -742,7 +773,7 @@
                  console.log("Usando dados iniciais devido a erro de carregamento.");
                  // Garante que a tela de cadastro seja mostrada em caso de erro de carregamento
                  showRegistrationScreen();
-                 registrationErrorMessageEl.textContent = "Ocorreu um erro ao carregar os dados. Por favor, tente novamente ou limpe o armazenamento local.";
+                 registrationErrorMessageEl.textContent = "Ocorreu um erro inesperado ao carregar os dados. Por favor, tente novamente ou limpe o armazenamento local.";
                  registrationErrorMessageEl.style.display = 'block';
                  return; // Sai da função para não continuar a inicialização com dados inconsistentes
             }
@@ -793,6 +824,7 @@
                     // Simula uma resposta do contato
                     const contact = allContacts.find(c => c.id === currentChatId); // Busca na lista atual de contatos
                     let replyMessage = null;
+                    // Verifica se o contato está online antes de simular a resposta
                     if (contact && contact.online) {
                         // --- Lógica para gerar resposta contextual (SIMULADA) ---
                         const lowerText = text.toLowerCase();
@@ -843,7 +875,7 @@
                          if (lowerText.includes('olá') || lowerText.includes('oi') || lowerText.includes('tudo bem') || lowerText.includes('como você está')) {
                              addPhrase('greeting', mainTopicFound ? 0.3 : 1.0); // Alta chance se não for tópico principal
                              addPhrase('howAreYou', mainTopicFound ? 0.4 : 0.8); // Alta chance se não for tópico principal
-                             if (!mainTopicFound) addPhrase('question', 0.4); // Adiciona pergunta se for apenas saudação
+                             if (!mainTopicFound) addPhrase('inquiry', 0.4); // Adiciona pergunta se for apenas saudação
                          }
 
                         if (lowerText.includes('obrigado') || lowerText.includes('valeu') || lowerText.includes('agradeço')) {
@@ -893,11 +925,18 @@
                                  }
                              } else { // Para mensagens curtas ou sem match, use uma confirmação, reconhecimento ou aleatória
                                  const fallbackOptions = [...responseRepertoire.confirmation, ...responseRepertoire.acknowledgement, ...responseRepertoire.random];
-                                 // Adiciona 1 a 2 frases de fallback
+                                 // Adiciona 1 a 3 frases de fallback para aumentar as combinações
                                  addPhrase(fallbackOptions[Math.floor(Math.random() * fallbackOptions.length)], 1.0);
-                                 addPhrase(fallbackOptions[Math.floor(Math.random() * fallbackOptions.length)], 0.5);
+                                 addPhrase(fallbackOptions[Math.floor(Math.random() * fallbackOptions.length)], 0.7); // Segunda frase com 70% de chance
+                                 addPhrase(fallbackOptions[Math.floor(Math.random() * fallbackOptions.length)], 0.4); // Terceira frase com 40% de chance
                              }
                         }
+
+                        // Adiciona frases de acompanhamento ou casuais com baixa chance
+                        addPhrase('follow_up', 0.2);
+                        addPhrase('casual', 0.3);
+                        addPhrase('emojis', 0.5); // Adiciona um emoji com 50% de chance
+
 
                         // Junta as frases selecionadas para formar a resposta final
                          // Embaralha as frases para variar a ordem
@@ -923,12 +962,26 @@
                              simulatedBackend.messages[contactId] = [];
                         }
                         simulatedBackend.messages[contactId].push(replyMessage);
+                    } else {
+                         // Se o contato estiver offline, simula uma mensagem de erro ou ausência
+                         replyMessage = {
+                             senderId: contactId,
+                             text: `(Este contato está offline e não pode responder agora.)`,
+                             time: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+                             type: 'received' // Ainda é uma mensagem "recebida" do ponto de vista do chat
+                         };
+                          if (!simulatedBackend.messages[contactId]) {
+                             simulatedBackend.messages[contactId] = [];
+                          }
+                         simulatedBackend.messages[contactId].push(replyMessage);
+                         console.log(`Contato ${contactId} está offline. Resposta simulada de offline.`);
                     }
+
 
                     // Resolve com a mensagem enviada e a resposta simulada (se houver)
                     resolve({ sent: newMessage, received: replyMessage });
 
-                }, 200 + Math.random() * 400); // Simula um atraso para envio e resposta (levemente maior)
+                }, 200 + Math.random() * 500); // Simula um atraso para envio e resposta (levemente maior)
             });
         }
 
@@ -1047,7 +1100,7 @@
             // Esconde o placeholder inicial se houver mensagens
             initialMessagePlaceholderEl.classList.add('hidden');
 
-            messagesToRender.forEach(msg => {
+            messagesToRender.forEach((msg, index) => { // Adiciona index para identificar a mensagem
                 const messageDiv = document.createElement('div');
                  // Determina o alinhamento e a cor da bolha com base no tipo (sent/received)
                 messageDiv.className = `flex ${msg.type === 'sent' ? 'justify-end' : 'justify-start'} mb-2`;
@@ -1085,12 +1138,13 @@
 
 
                     messageContent = `
-                        <div class="message-bubble file ${msg.type}">
+                        <div class="message-bubble file ${msg.type}" data-message-index="${index}">
                             <div class="file-info">
                                 <i class="${fileIconClass} file-icon"></i>
                                 <span class="file-name">${file.name}</span>
                             </div>
                             <p class="file-size">${formatBytes(file.size)}</p>
+                             ${msg.type === 'sent' ? '<i class="fas fa-trash-alt delete-message-icon"></i>' : ''}
                         </div>
                     `;
                      // Adiciona a classe 'sent' ou 'received' na div externa para alinhamento
@@ -1099,9 +1153,10 @@
                 } else {
                     // Mensagem de texto normal
                     messageContent = `
-                        <div class="message-bubble ${msg.type}">
+                        <div class="message-bubble ${msg.type}" data-message-index="${index}">
                             <p class="text-sm">${msg.text}</p>
                             <p class="text-xs ${msg.type === 'sent' ? 'text-blue-200' : 'text-gray-400'} mt-1 text-right">${msg.time}</p>
+                             ${msg.type === 'sent' ? '<i class="fas fa-trash-alt delete-message-icon"></i>' : ''}
                         </div>
                     `;
                 }
@@ -1110,8 +1165,62 @@
                 messageDiv.innerHTML = messageContent;
                 messageListEl.appendChild(messageDiv);
             });
+
+            // Adiciona listeners para os ícones de lixeira APÓS renderizar as mensagens
+            messageListEl.querySelectorAll('.delete-message-icon').forEach(icon => {
+                icon.addEventListener('click', handleDeleteMessage);
+            });
+
             scrollToBottom(); // Rola para a última mensagem
         }
+
+        // Função para lidar com a exclusão de mensagens
+        function handleDeleteMessage(event) {
+            console.log("Ícone de lixeira clicado.");
+            const icon = event.target;
+            // Encontra a bolha de mensagem pai
+            const messageBubble = icon.closest('.message-bubble');
+            if (!messageBubble) {
+                console.error("Não foi possível encontrar a bolha de mensagem pai.");
+                return;
+            }
+
+            // Obtém o índice da mensagem a partir do data attribute
+            const messageIndex = parseInt(messageBubble.getAttribute('data-message-index'), 10);
+            console.log(`Tentando deletar mensagem no índice: ${messageIndex} para o chat ID: ${currentChatId}`);
+
+
+            if (currentChatId !== null && !isNaN(messageIndex) && messageIndex >= 0 && messageIndex < currentChatMessages.length) {
+                 // Remove a mensagem do array local
+                 const deletedMessage = currentChatMessages.splice(messageIndex, 1)[0];
+                 console.log("Mensagem deletada do array local:", deletedMessage);
+
+                 // Atualiza o array no simulatedBackend
+                 if (simulatedBackend.messages[currentChatId]) {
+                     simulatedBackend.messages[currentChatId].splice(messageIndex, 1);
+                     console.log("Mensagem deletada do simulatedBackend.");
+                 }
+
+                 // Re-renderiza as mensagens para refletir a exclusão
+                 renderMessages(currentChatMessages);
+
+                 // Opcional: Atualizar a última mensagem na lista de contatos se a mensagem deletada for a última
+                 const contact = allContacts.find(c => c.id === currentChatId);
+                 if (contact) {
+                     const lastMsg = currentChatMessages[currentChatMessages.length - 1];
+                     contact.lastMessage = lastMsg ? (lastMsg.file ? `Arquivo: ${lastMsg.file.name}` : lastMsg.text) : ''; // Atualiza para a nova última mensagem ou vazio
+                     contact.timestamp = lastMsg ? lastMsg.time : ''; // Atualiza timestamp ou vazio
+                     filterAndRenderContacts(); // Re-renderiza a lista de contatos
+                 }
+
+                 // Em um app real, você enviaria uma requisição para o backend deletar a mensagem.
+                 // saveStateToLocalStorage(); // Salva o estado (contatos e usuários), mensagens não persistem nesta simulação.
+
+            } else {
+                console.error(`Erro ao deletar mensagem: Índice inválido (${messageIndex}) ou chat não selecionado (${currentChatId}).`);
+            }
+        }
+
 
         // Atualiza o cabeçalho da área de chat com as informações do contato
         function updateChatHeader(contact) {
@@ -1249,8 +1358,8 @@
             if (contact) {
                  // Usa a última mensagem real (pode ser a enviada ou a resposta)
                  const lastMsg = currentChatMessages[currentChatMessages.length - 1];
-                 contact.lastMessage = lastMsg.text;
-                 contact.timestamp = lastMsg.time;
+                 contact.lastMessage = lastMsg ? (lastMsg.file ? `Arquivo: ${lastMsg.file.name}` : lastMsg.text) : ''; // Atualiza para a nova última mensagem ou vazio
+                 contact.timestamp = lastMsg ? lastMsg.time : ''; // Atualiza timestamp ou vazio
                  // Re-renderiza a lista de contatos para refletir a mudança e a ordenação
                  filterAndRenderContacts(); // Filtra e renderiza com base na busca atual
             }
@@ -1785,7 +1894,7 @@
                 console.error("Erro fatal durante a inicialização:", e);
                  // Em caso de erro fatal, garante que a tela de autenticação seja mostrada
                  showRegistrationScreen(); // Mostra a tela de cadastro
-                 registrationErrorMessageEl.textContent = "Ocorreu um erro inesperado. Por favor, tente novamente ou limpe o armazenamento local.";
+                 registrationErrorMessageEl.textContent = "Ocorreu um erro inesperado ao carregar os dados. Por favor, tente novamente ou limpe o armazenamento local.";
                  registrationErrorMessageEl.style.display = 'block';
             }
         });
