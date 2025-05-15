@@ -30,6 +30,7 @@
             background-color: #fff; /* Fundo branco para o container */
              /* Adiciona um gradiente sutil ou textura de fundo */
             background-image: linear-gradient(to bottom right, #ffffff, #f9f9f9);
+            display: none; /* Inicialmente escondido */
         }
         /* Estilos para a barra lateral */
         .sidebar {
@@ -49,6 +50,7 @@
                 top: 0;
                 z-index: 20; /* Garante que fique por cima do modal */
                 transform: translateX(-100%); /* Animação */
+                transition: transform 0.3s ease-in-out;
             }
         }
         .sidebar.open {
@@ -402,7 +404,7 @@
     </style>
 </head>
 <body>
-    <div class="registration-screen" id="registration-screen">
+    <div class="registration-screen" id="registration-screen" style="display: none;">
         <div class="registration-form">
             <h2>Criar Conta</h2>
             <div>
@@ -426,7 +428,7 @@
         </div>
     </div>
 
-    <div class="chat-container" id="chat-container">
+    <div class="chat-container" id="chat-container" style="display: none;">
         <div class="sidebar" id="sidebar">
             <div class="p-4 border-b border-gray-300 flex items-center justify-between">
                  <button class="back-button mr-3 p-1 rounded-full hover:bg-gray-200" id="back-to-contacts" title="Voltar para Contatos">
@@ -458,6 +460,9 @@
 
         <div class="chat-area" id="chat-area">
             <div id="chat-header" class="p-4 border-b border-gray-300 bg-gray-50 flex items-center space-x-3">
+                <button class="back-button mr-3 p-1 rounded-full hover:bg-gray-200" id="back-to-contacts-header" title="Voltar para Contatos">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
                 <div class="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center text-xl text-white">
                     <i class="fas fa-user-circle"></i>
                  </div>
@@ -533,10 +538,11 @@
             // Lista de TODOS os usuários potenciais no sistema simulado
             allPotentialUsers: [
                  // Inclui os contatos iniciais como potenciais usuários
+                 // Definindo todos como online por padrão
                 { id: 1, fullName: 'Alice Silva', name: 'Alice', phone: '11987654321', email: 'alice@example.com', avatar: 'https://placehold.co/100x100/A9D1F7/4F4F4F?text=AS', online: true },
-                { id: 2, fullName: 'Bruno Costa', name: 'Bruno', phone: '21987654321', email: 'bruno@example.com', avatar: 'https://placehold.co/100x100/F7C9A9/4F4F4F?text=BC', online: false },
+                { id: 2, fullName: 'Bruno Costa', name: 'Bruno', phone: '21987654321', email: 'bruno@example.com', avatar: 'https://placehold.co/100x100/F7C9A9/4F4F4F?text=BC', online: true },
                 { id: 3, fullName: 'Carla Dias', name: 'Carla', phone: '31987654321', email: 'carla@example.com', avatar: 'https://placehold.co/100x100/A9F7C0/4F4F4F?text=CD', online: true },
-                { id: 4, fullName: 'Daniel Alves', name: 'Daniel', phone: '41987654321', email: 'daniel@example.com', avatar: 'https://placehold.co/100x100/F7A9A9/4F4F4F?text=DA', online: false },
+                { id: 4, fullName: 'Daniel Alves', name: 'Daniel', phone: '41987654321', email: 'daniel@example.com', avatar: 'https://placehold.co/100x100/F7A9A9/4F4F4F?text=DA', online: true },
                 { id: 5, fullName: 'Eduarda Lima', name: 'Eduarda', phone: '51987654321', email: 'eduarda@example.com', avatar: 'https://placehold.co/100x100/D8A9F7/4F4F4F?text=EL', online: true },
                  // Novos usuários potenciais (serão adicionados aqui após o cadastro)
             ],
@@ -568,6 +574,65 @@
             }
         };
 
+        // Repertório expandido de frases para respostas simuladas
+        const responseRepertoire = {
+            greeting: [
+                "Olá!", "Oi!", "E aí!", "Tudo bem?", "Como vai?", "Oi, tudo certo?", "Saudações!", "Fala!", "Opa!"
+            ],
+            howAreYou: [
+                "Estou bem, obrigado por perguntar!", "Tudo tranquilo por aqui.", "Indo bem.", "Estou ótimo!", "Tudo certo por aqui.", "Muito bem, e você?", "Aqui tudo joia!", "Na paz, e você?"
+            ],
+            meeting: [
+                "Claro, podemos marcar.", "Que dia e hora seria bom?", "Tenho a tarde livre.", "Confirme o horário.", "Podemos agendar.", "Quando você estaria disponível?", "Vamos combinar algo.", "Que tal amanhã?", "Me diga um horário que funcione para você."
+            ],
+            file: [
+                "Ok, estou aguardando o arquivo!", "Pode enviar o documento.", "Recebi o arquivo, obrigado!", "Certo, vou dar uma olhada no relatório.", "Assim que receber, te aviso.", "Obrigado por enviar o arquivo.", "O arquivo chegou!", "Vou analisar o documento.", "Pode me mandar o anexo."
+            ],
+            help: [
+                "Posso ajudar!", "Me diga o que precisa.", "Estou aqui para ajudar.", "Qual a questão?", "Em que posso ser útil?", "Pode perguntar!", "Estou à disposição.", "Conta comigo!", "No que posso te dar uma força?"
+            ],
+            thanks: [
+                "De nada! 😊", "Por nada!", "Disponha!", "Que bom que pude ajudar!", "Imagina!", "Sem problemas!", "Foi um prazer ajudar!", "Qualquer coisa, é só chamar.", "Não há de quê."
+            ],
+            farewell: [
+                "Até logo!", "Tchau, tchau!", "Nos falamos!", "Até a próxima!", "Um abraço!", "Até mais!", "Fui!", "A gente se fala!", "Tenha um bom dia/tarde/noite!"
+            ],
+            confirmation: [
+                "Ótimo!", "Perfeito!", "Combinado!", "Entendido!", "Certo!", "Concordo!", "Isso!", "Beleza!", "Fechado!", "Confirmado!", "Exato!", "Certamente."
+            ],
+            negation: [
+                "Ah, entendi.", "Sem problemas.", "Ok, talvez na próxima.", "Compreendo.", "Entendido, sem fazer isso então.", "Não será possível.", "Infelizmente, não.", "Que pena."
+            ],
+            general: [
+                "Certo.", "Ok.", "Entendi.", "Hmm.", "Interessante.", "Legal!", "Bom saber.", "Pode crer.", "Faz sentido.", "Sim, sim.", "Entendido.", "Ok, prossiga.", "Continuando...", "E então?", "O que mais?"
+            ],
+            question: [
+                "O que você acha?", "Como podemos fazer?", "Alguma ideia?", "E sobre...?", "Você já viu isso?", "Qual o próximo passo?", "Como está indo?", "Alguma novidade?", "O que me diz?", "Qual a sua opinião?", "Tem alguma sugestão?"
+            ],
+            availability: [
+                "Estou livre agora.", "Tenho um tempo mais tarde.", "Estou um pouco ocupado no momento.", "Me avise quando estiver pronto.", "Posso falar agora.", "Estou disponível.", "Tenho uns minutos.", "Agora dá.", "Mais tarde fica melhor."
+            ],
+            agreement: [
+                "Concordo.", "Isso mesmo.", "Perfeito.", "Sem dúvida.", "Estamos alinhados.", "Exato!", "Pensamos igual.", "Totalmente de acordo.", "É bem por aí."
+            ],
+            disagreement: [
+                "Não tenho certeza.", "Talvez não seja a melhor ideia.", "Precisamos pensar melhor.", "Tenho outro ponto de vista.", "Não vejo bem assim.", "Discordo um pouco.", "Não concordo totalmente.", "Podemos discutir isso."
+            ],
+             emotion_positive: [
+                 "Que bom!", "Fico feliz!", "Excelente!", "Maravilha!", "Que notícia ótima!", "Adorei!"
+             ],
+             emotion_negative: [
+                 "Que pena.", "Que chato.", "Sinto muito.", "Puxa vida.", "Que complicado."
+             ],
+             suggestion: [
+                 "Que tal se fizermos...?", "Podemos tentar...", "Sugiro que...", "Minha ideia é...", "Que acha de...?"
+             ],
+             random: [ // Frases aleatórias para variar
+                "Que interessante!", "Bom dia/tarde/noite!", "Espero que esteja tudo bem.", "Recebi sua mensagem.", "Estou pensando sobre isso.", "Parece bom.", "Vamos ver.", "Combinado!", "Ok, pode ser.", "Entendido, obrigado!", "Estou por aqui se precisar.", "Tudo certo.", "Sem novidades por aqui.", "Dia corrido.", "Pausa para um café?"
+             ]
+        };
+
+
         // Variável que armazena o estado atual do backend simulado (será carregada ou usará dados iniciais)
         let simulatedBackend = {};
 
@@ -586,18 +651,22 @@
         // Salva o estado atual no localStorage
         function saveStateToLocalStorage() {
             try {
+                console.log("Tentando salvar estado no localStorage...");
                 // Salva contatos e o usuário atual
                 localStorage.setItem(LOCAL_STORAGE_CONTACTS_KEY, JSON.stringify(simulatedBackend.contacts));
                  if (simulatedBackend.currentUser) {
                      localStorage.setItem(LOCAL_STORAGE_USER_KEY, JSON.stringify(simulatedBackend.currentUser));
+                     console.log("Usuário atual salvo no localStorage.");
                  } else {
                      localStorage.removeItem(LOCAL_STORAGE_USER_KEY);
+                     console.log("Usuário atual removido do localStorage.");
                  }
 
                  // Salva a lista completa de usuários
                  localStorage.setItem(LOCAL_STORAGE_ALL_USERS_KEY, JSON.stringify(simulatedBackend.allPotentialUsers));
+                 console.log("Lista completa de usuários salva no localStorage.");
 
-                console.log("Estado salvo no localStorage.");
+
             } catch (e) {
                 console.error("Erro ao salvar estado no localStorage:", e);
             }
@@ -606,13 +675,20 @@
         // Carrega o estado do localStorage na inicialização
         function loadStateFromLocalStorage() {
             try {
+                console.log("Tentando carregar estado do localStorage...");
                 const savedContacts = localStorage.getItem(LOCAL_STORAGE_CONTACTS_KEY);
                 const savedUser = localStorage.getItem(LOCAL_STORAGE_USER_KEY);
                  const savedAllUsers = localStorage.getItem(LOCAL_STORAGE_ALL_USERS_KEY);
 
+                 console.log("savedContacts:", savedContacts ? "Encontrado" : "Não encontrado");
+                 console.log("savedUser:", savedUser ? "Encontrado" : "Não encontrado");
+                 console.log("savedAllUsers:", savedAllUsers ? "Encontrado" : "Não encontrado");
+
 
                 // Carrega dados iniciais como base
                 simulatedBackend = JSON.parse(JSON.stringify(initialSimulatedBackendData)); // Cria uma cópia profunda
+                console.log("Dados iniciais carregados como base.");
+
 
                  // Tenta carregar a lista completa de usuários do localStorage
                  if (savedAllUsers) {
@@ -642,7 +718,9 @@
                  }
 
                  // Mensagens sempre vêm dos dados iniciais nesta simulação (não persistem)
+                 // Em um app real, as mensagens seriam carregadas do backend para o currentUser
                  simulatedBackend.messages = initialSimulatedBackendData.messages;
+                 console.log("Mensagens iniciais carregadas.");
 
 
             } catch (e) {
@@ -653,6 +731,7 @@
             }
              // Garante que allContacts reflita simulatedBackend.contacts após carregar
              allContacts = [...simulatedBackend.contacts];
+             console.log("Variável local allContacts sincronizada com simulatedBackend.contacts.");
         }
 
 
@@ -695,36 +774,130 @@
                     simulatedBackend.messages[contactId].push(newMessage);
 
                     // Simula uma resposta do contato
-                    const contact = allContacts.find(c => c.id === contactId); // Busca na lista atual de contatos
+                    const contact = allContacts.find(c => c.id === currentChatId); // Busca na lista atual de contatos
                     let replyMessage = null;
                     if (contact && contact.online) {
                         // --- Lógica para gerar resposta contextual (SIMULADA) ---
-                        let replyText = "Entendido! 👍"; // Resposta padrão
-
                         const lowerText = text.toLowerCase();
+                        let selectedPhrases = [];
+                        let basePhraseAdded = false; // Flag para garantir pelo menos uma frase base
 
+                        // Função auxiliar para adicionar uma frase de uma categoria com chance
+                        const addPhrase = (category, chance = 1.0) => {
+                            if (Math.random() < chance && responseRepertoire[category] && responseRepertoire[category].length > 0) {
+                                const phrase = responseRepertoire[category][Math.floor(Math.random() * responseRepertoire[category].length)];
+                                if (!selectedPhrases.includes(phrase)) { // Evita frases duplicadas na mesma resposta
+                                    selectedPhrases.push(phrase);
+                                    return true; // Retorna true se adicionou
+                                }
+                            }
+                            return false; // Retorna false se não adicionou
+                        };
+
+                        // Lógica de seleção e combinação de frases com base em palavras-chave
                         if (lowerText.includes('olá') || lowerText.includes('oi') || lowerText.includes('tudo bem')) {
-                            replyText = `Olá! Tudo ótimo por aqui!`; // Resposta genérica sem nome do contato
-                        } else if (lowerText.includes('marcar') || lowerText.includes('reunião') || lowerText.includes('café')) {
-                            replyText = `Claro! Qual horário seria bom para você?`;
-                        } else if (lowerText.includes('arquivo') || lowerText.includes('documento') || lowerText.includes('relatório')) {
-                             replyText = `Ok, estou aguardando o arquivo!`;
-                        } else if (lowerText.includes('ajuda') || lowerText.includes('dúvida')) {
-                             replyText = `Posso ajudar! Qual é a sua dúvida?`;
-                        } else if (lowerText.includes('obrigado') || lowerText.includes('valeu')) {
-                             replyText = `De nada! 😊`;
-                        } else if (lowerText.includes('até mais') || lowerText.includes('tchau')) {
-                             replyText = `Até logo!`;
-                        } else if (lowerText.includes('como você está')) {
-                             replyText = `Estou bem, obrigado por perguntar! E você?`;
-                        } else if (lowerText.includes('o que você faz')) {
-                            replyText = `Sou um contato simulado neste aplicativo. 😊`;
+                            addPhrase('greeting', 1.0); // Sempre adiciona uma saudação
+                            addPhrase('howAreYou', 0.7); // Chance de adicionar como está
+                             basePhraseAdded = true;
                         }
+
+                        if (lowerText.includes('marcar') || lowerText.includes('reunião') || lowerText.includes('café') || lowerText.includes('encontrar')) {
+                            addPhrase('meeting', 1.0); // Sempre adiciona algo sobre marcar
+                            addPhrase('availability', 0.6); // Chance de adicionar algo sobre disponibilidade
+                             addPhrase('question', 0.5); // Chance de adicionar uma pergunta relacionada
+                             basePhraseAdded = true;
+                        }
+
+                        if (lowerText.includes('arquivo') || lowerText.includes('documento') || lowerText.includes('relatório') || lowerText.includes('anexo')) {
+                             addPhrase('file', 1.0); // Sempre adiciona algo sobre arquivo
+                             addPhrase('confirmation', 0.5); // Chance de confirmar
+                             basePhraseAdded = true;
+                        }
+
+                        if (lowerText.includes('ajuda') || lowerText.includes('dúvida') || lowerText.includes('questão') || lowerText.includes('problema')) {
+                             addPhrase('help', 1.0); // Sempre adiciona algo sobre ajuda
+                             addPhrase('question', 0.7); // Alta chance de adicionar uma pergunta
+                             basePhraseAdded = true;
+                        }
+
+                        if (lowerText.includes('obrigado') || lowerText.includes('valeu') || lowerText.includes('agradeço')) {
+                             addPhrase('thanks', 1.0); // Sempre adiciona um agradecimento
+                             addPhrase('farewell', 0.3); // Pequena chance de despedida
+                             basePhraseAdded = true;
+                        }
+
+                        if (lowerText.includes('até mais') || lowerText.includes('tchau') || lowerText.includes('falou') || lowerText.includes('abraço')) {
+                             addPhrase('farewell', 1.0); // Sempre adiciona uma despedida
+                             addPhrase('thanks', 0.2); // Pequena chance de agradecer de volta
+                             basePhraseAdded = true;
+                        }
+
+                        if (lowerText.includes('como você está') || lowerText.includes('tudo bem com você')) {
+                             addPhrase('howAreYou', 1.0); // Sempre responde como está
+                             addPhrase('question', 0.5); // Chance de perguntar de volta
+                             basePhraseAdded = true;
+                        }
+
+                         if (lowerText.includes('o que você faz')) {
+                             replyText = `Sou um contato simulado neste aplicativo. 😊 Posso responder a algumas frases comuns!`;
+                             selectedPhrases = [replyText]; // Substitui as frases selecionadas
+                             basePhraseAdded = true;
+                         }
+
+                        if (lowerText.includes('sim') || lowerText.includes('ok') || lowerText.includes('certo') || lowerText.includes('beleza')) {
+                             addPhrase('confirmation', 1.0); // Sempre confirma
+                             addPhrase('general', 0.4); // Chance de adicionar uma frase geral
+                             basePhraseAdded = true;
+                        }
+
+                        if (lowerText.includes('não')) {
+                             addPhrase('negation', 1.0); // Sempre nega/compreende
+                             addPhrase('general', 0.3); // Chance de adicionar uma frase geral
+                             basePhraseAdded = true;
+                        }
+
+                         if (lowerText.includes('feliz') || lowerText.includes('ótimo') || lowerText.includes('bom')) {
+                             addPhrase('emotion_positive', 0.8); // Alta chance de resposta positiva
+                             addPhrase('general', 0.3);
+                             basePhraseAdded = true;
+                         }
+
+                         if (lowerText.includes('triste') || lowerText.includes('chateado') || lowerText.includes('ruim')) {
+                             addPhrase('emotion_negative', 0.8); // Alta chance de resposta negativa
+                             addPhrase('general', 0.3);
+                             basePhraseAdded = true;
+                         }
+
+                         if (lowerText.includes('sugere') || lowerText.includes('proposta') || lowerText.includes('ideia')) {
+                             addPhrase('suggestion', 0.8); // Alta chance de sugerir algo
+                             addPhrase('question', 0.4);
+                             basePhraseAdded = true;
+                         }
+
+
+                        // Se nenhuma palavra-chave específica foi encontrada ou a resposta base não foi adicionada, use uma resposta geral ou aleatória
+                        if (!basePhraseAdded || selectedPhrases.length === 0) {
+                             if (lowerText.length > 10 && Math.random() < 0.7) { // Maior chance de resposta geral para mensagens mais longas
+                                 addPhrase('general', 1.0);
+                                 if (Math.random() < 0.4) { // Chance de adicionar uma pergunta
+                                      addPhrase('question', 1.0);
+                                 }
+                             } else { // Para mensagens curtas ou sem match, use uma confirmação ou aleatória
+                                 const fallbackOptions = [...responseRepertoire.confirmation, ...responseRepertoire.random];
+                                 selectedPhrases.push(fallbackOptions[Math.floor(Math.random() * fallbackOptions.length)]);
+                             }
+                        }
+
+                        // Junta as frases selecionadas para formar a resposta final
+                         // Embaralha as frases para variar a ordem
+                         selectedPhrases.sort(() => Math.random() - 0.5);
+                         replyText = selectedPhrases.join(' '); // Junta com um espaço
+
                         // --- Fim da Lógica de Resposta ---
 
                          replyMessage = {
                             senderId: contactId,
-                            text: replyText,
+                            text: replyText.trim(), // Remove espaços extras no início/fim
                             time: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
                             type: 'received'
                         };
@@ -738,7 +911,7 @@
                     // Resolve com a mensagem enviada e a resposta simulada (se houver)
                     resolve({ sent: newMessage, received: replyMessage });
 
-                }, 200 + Math.random() * 200); // Simula um atraso para envio e resposta
+                }, 200 + Math.random() * 300); // Simula um atraso para envio e resposta (levemente maior)
             });
         }
 
@@ -765,6 +938,7 @@
         const noContactsFoundEl = document.getElementById('no-contacts-found');
         const backButtonEl = document.getElementById('back-to-contacts');
 
+
         // Elementos do Modal de Perfil/Configurações
         const profileButtonEl = document.getElementById('profile-button'); // Novo botão de perfil
         const userStatusDotEl = document.getElementById('user-status-dot'); // Indicador de status do usuário
@@ -788,6 +962,10 @@
         let allContacts = []; // Lista completa de contatos (do backend simulado)
         let currentChatId = null; // ID do chat atualmente aberto
         let currentChatMessages = []; // Mensagens do chat atual
+
+        // --- Funções de Persistência (localStorage) --- (Já atualizadas acima)
+
+        // --- Funções de Simulação de Backend (usando dados em memória) --- (Já atualizadas acima)
 
         // --- Funções de Renderização ---
 
@@ -1119,20 +1297,29 @@
 
         // Processa os parâmetros da URL na inicialização (chatId ou inviteUserId)
         async function processUrlParams() {
+            console.log("Iniciando processUrlParams...");
             const params = new URLSearchParams(window.location.search);
             const chatIdFromUrl = params.get('chatId');
-            const inviteUserIdFromUrl = params.get('inviteUserId'); // Novo parâmetro para convite de usuário
+            const inviteUserIdFromUrl = params.get('inviteUserId');
+
+            console.log("chatIdFromUrl:", chatIdFromUrl);
+            console.log("inviteUserIdFromUrl:", inviteUserIdFromUrl);
+
 
             // Carrega o estado do localStorage (incluindo o usuário, contatos e ALL USERS)
             loadStateFromLocalStorage();
 
+            console.log("simulatedBackend.currentUser após carregar:", simulatedBackend.currentUser);
+
             // Verifica se o usuário já está cadastrado
             if (simulatedBackend.currentUser) {
+                console.log("Usuário logado encontrado. Mostrando tela de chat.");
                 // Usuário cadastrado, mostra a tela de chat
                 showChatScreen();
                 updateUserStatusIndicator(); // Atualiza o indicador de status do usuário
 
                 // --- Lógica para adicionar novos contatos ao usuário logado ---
+                console.log("Verificando novos usuários para adicionar aos contatos...");
                 // Itera sobre todos os usuários potenciais (carregados do localStorage)
                 simulatedBackend.allPotentialUsers.forEach(potentialUser => {
                      // Verifica se não é o usuário logado E se não está já na lista de contatos
@@ -1148,7 +1335,7 @@
                              lastMessage: 'Novo usuário!', // Mensagem padrão para novo contato
                              timestamp: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
                              unread: 0, // Começa sem mensagens não lidas
-                             online: potentialUser.online // Simula o status online
+                             online: potentialUser.online // Simula o status online (agora todos são online por padrão)
                          };
                          simulatedBackend.contacts.push(newContact);
                          allContacts.push(newContact); // Mantém a lista local sincronizada
@@ -1157,39 +1344,48 @@
                 });
                 // Salva a lista de contatos atualizada (com os novos) no localStorage
                 saveStateToLocalStorage();
+                console.log("Lista de contatos atualizada e salva.");
                 // --- Fim da lógica de adição de novos contatos ---
 
 
                 // Se houver um chatId na URL, tenta abrir o chat
                 if (chatIdFromUrl) {
+                    console.log(`Tentando abrir chat com ID da URL: ${chatIdFromUrl}`);
                     const contactId = parseInt(chatIdFromUrl);
                     const contactToOpen = allContacts.find(c => c.id === contactId);
                     if (contactToOpen) {
                         setTimeout(() => {
-                            selectChat(contactToOpen.id);
+                             console.log(`Selecionando chat com contato: ${contactToOpen.name}`);
+                             selectChat(contactToOpen.id);
                         }, 100);
                     } else {
-                        console.warn(`Contato com ID ${chatIdFromUrl} (da URL) não encontrado.`);
+                        console.warn(`Contato com ID ${chatIdFromUrl} (da URL) não encontrado na lista de contatos.`);
                     }
                 }
 
                 // Renderiza a lista de contatos (agora incluindo os novos contatos adicionados acima)
+                console.log("Renderizando lista de contatos...");
                 filterAndRenderContacts();
 
             } else {
+                console.log("Nenhum usuário logado encontrado. Mostrando tela de cadastro.");
                 // Usuário não cadastrado, mostra a tela de cadastro
                 showRegistrationScreen();
                  // Se houver um inviteUserId na URL E o usuário NÃO ESTÁ CADASTRO, armazena o ID do convidante.
-                 if (inviteUserIdFromUrl) {
+                 if (inviteUserIdFromUrl) { // Verifica se invitingUserIdOnLoad tem um valor (não null ou undefined)
                      invitingUserIdOnLoad = parseInt(inviteUserIdFromUrl);
                      console.log(`InviteUserId ${invitingUserIdOnLoad} detectado. Será processado após o cadastro.`);
+                 } else {
+                     invitingUserIdOnLoad = null; // Garante que seja null se não estiver na URL
                  }
             }
+             console.log("Fim de processUrlParams.");
         }
 
 
         // Filtra e renderiza os contatos com base no termo de busca
         function filterAndRenderContacts() {
+            console.log("Filtrando e renderizando contatos...");
             const searchTerm = searchContactInputEl.value.toLowerCase();
             // Filtra a partir da lista completa (allContacts)
             const filtered = allContacts.filter(contact =>
@@ -1197,42 +1393,72 @@
                 (contact.lastMessage && contact.lastMessage.toLowerCase().includes(searchTerm)) // Opcional: buscar na última mensagem (verifica se lastMessage existe)
             );
             renderContacts(filtered); // Renderiza a lista filtrada
+             console.log("Contatos filtrados e renderizados.");
         }
 
         // Função para mostrar a barra lateral (usado em mobile)
         function showSidebar() {
-            sidebarEl.classList.add('open');
-            chatAreaEl.classList.remove('active');
+             console.log("Mostrando sidebar.");
+             sidebarEl.classList.add('open');
+             chatAreaEl.classList.remove('active');
+             // Reseta o chat atual ao voltar para a lista de contatos
+             currentChatId = null;
+             currentChatMessages = [];
+             updateChatHeader({ name: 'Selecione um contato', online: false, avatar: '' }); // Cabeçalho padrão
+             renderMessages([]); // Limpa as mensagens
+             messageInputEl.disabled = true; // Desabilita input
+             sendButtonEl.disabled = true;
+             messageInputEl.placeholder = "Selecione um contato...";
         }
 
         // Função para mostrar a área de chat (usado em mobile)
         function showChatArea() {
-            sidebarEl.classList.remove('open');
-            chatAreaEl.classList.add('active');
+             console.log("Mostrando área de chat.");
+             sidebarEl.classList.remove('open');
+             chatAreaEl.classList.add('active');
         }
 
          // Função para mostrar a tela de cadastro
         function showRegistrationScreen() {
+            console.log("Mostrando tela de cadastro.");
+            registrationScreenEl.style.display = 'flex'; // Usa display: flex para mostrar a tela
             registrationScreenEl.classList.add('visible');
             chatContainerEl.style.display = 'none'; // Esconde o container do chat
+             registrationErrorMessageEl.style.display = 'none'; // Garante que a mensagem de erro esteja escondida
+             registrationErrorMessageEl.textContent = '';
         }
 
          // Função para mostrar a tela de chat
         function showChatScreen() {
+            console.log("Mostrando tela de chat.");
+            registrationScreenEl.style.display = 'none'; // Esconde a tela de cadastro
             registrationScreenEl.classList.remove('visible');
             chatContainerEl.style.display = 'flex'; // Mostra o container do chat
+             // Garante que a sidebar esteja visível (especialmente em desktop)
+             sidebarEl.classList.add('open');
+             // Esconde a área de chat por padrão ao entrar na tela de chat
+             chatAreaEl.classList.remove('active');
+             // Reseta o chat atual
+             currentChatId = null;
+             currentChatMessages = [];
+             updateChatHeader({ name: 'Selecione um contato', online: false, avatar: '' }); // Cabeçalho padrão
+             renderMessages([]); // Limpa as mensagens
+             messageInputEl.disabled = true; // Desabilita input
+             sendButtonEl.disabled = true;
+             messageInputEl.placeholder = "Selecione um contato...";
         }
 
 
         // Função para abrir o modal de Perfil
         function openProfileModal() {
+            console.log("Abrindo modal de perfil.");
             // Carrega os dados atuais do usuário simulado nos inputs do modal de perfil
             if (simulatedBackend.currentUser) {
                  profileFullNameInputEl.value = simulatedBackend.currentUser.fullName || '';
                  profileNicknameInputEl.value = simulatedBackend.currentUser.name || ''; // Apelido é o nome de exibição
                  profilePhoneInputEl.value = simulatedBackend.currentUser.phone || '';
                  profileEmailInputEl.value = simulatedBackend.currentUser.email || '';
-                 profileStatusSelectEl.value = simulatedBackend.currentUser.status || 'offline'; // Carrega o status atual
+                 profileStatusSelectEl.value = simulatedBackend.currentUser.status || 'online'; // Carrega o status atual (agora online por padrão)
 
                  // Campos desabilitados conforme a simulação permite editar apenas o apelido e status
                  profileFullNameInputEl.disabled = true;
@@ -1262,6 +1488,7 @@
 
         // Função para fechar o modal (Perfil/Configurações)
         function closeSettingsModal() {
+            console.log("Fechando modal de perfil.");
             settingsModalOverlayEl.classList.remove('visible');
              // Limpa a mensagem de erro ao fechar (se estiver sendo usada no modal)
              registrationErrorMessageEl.style.display = 'none';
@@ -1272,6 +1499,7 @@
 
         // Função para salvar as configurações do usuário (agora focado no Perfil)
         function saveProfileSettings() {
+            console.log("Salvando configurações de perfil...");
             const newNickname = profileNicknameInputEl.value.trim();
             const newStatus = profileStatusSelectEl.value;
 
@@ -1293,10 +1521,13 @@
             } else {
                 showMessageBox("O apelido não pode estar vazio.");
             }
+             console.log("Configurações de perfil salvas.");
         }
+
 
          // Função para lidar com o cadastro de um novo usuário
         function registerUser() {
+            console.log("Tentando cadastrar usuário...");
             const fullName = fullNameInputEl.value.trim();
             const nickname = nicknameInputEl.value.trim();
             const phone = phoneInputEl.value.trim();
@@ -1306,11 +1537,24 @@
             if (!fullName || !nickname || !phone || !email) {
                 registrationErrorMessageEl.textContent = "Por favor, preencha todos os campos.";
                 registrationErrorMessageEl.style.display = 'block';
+                console.log("Campos de cadastro incompletos.");
                 return;
             }
 
+             // Verifica se email ou telefone já existem (simulação básica)
+            const existingUser = simulatedBackend.allPotentialUsers.find(user => user.email === email || user.phone === phone);
+            if (existingUser) {
+                 registrationErrorMessageEl.textContent = "Email ou telefone já cadastrado.";
+                 registrationErrorMessageEl.style.display = 'block';
+                 console.log("Email ou telefone já cadastrado.");
+                 return;
+            }
+
+
             // Simula a criação de um novo usuário com um ID único (baseado no timestamp para simulação)
             const newUserId = Date.now() + Math.floor(Math.random() * 1000);
+            console.log("Gerando novo ID de usuário:", newUserId);
+
 
             const newUser = {
                 id: newUserId, // ID único para o usuário atual
@@ -1321,12 +1565,17 @@
                 avatar: `https://placehold.co/100x100/${Math.floor(Math.random()*16777215).toString(16)}/ffffff?text=${nickname.substring(0, 2).toUpperCase()}`, // Gera avatar com cor aleatória
                 status: 'online' // Define o status inicial como online
             };
+            console.log("Novo objeto de usuário criado:", newUser);
+
 
             simulatedBackend.currentUser = newUser; // Define o usuário atual
             simulatedBackend.contacts = []; // Garante que a lista de contatos do novo usuário comece vazia
+            console.log("simulatedBackend.currentUser definido como novo usuário.");
+
 
             // *** Lógica para processar o inviteUserId APÓS o cadastro ***
             if (invitingUserIdOnLoad !== null) {
+                 console.log(`Processando inviteUserIdOnLoad: ${invitingUserIdOnLoad}`);
                  const invitingUserId = invitingUserIdOnLoad;
                  const invitingUser = simulatedBackend.allPotentialUsers.find(user => user.id === invitingUserId);
 
@@ -1339,22 +1588,18 @@
                          lastMessage: 'Conectado via link!',
                          timestamp: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
                          unread: 1,
-                         online: invitingUser.online
+                         online: invitingUser.online // Mantém o status do convidante
                      };
                      simulatedBackend.contacts.push(newContact);
                      // allContacts será atualizado antes de renderizar
                      console.log(`Usuário ${invitingUser.name} (ID: ${invitingUserId}) adicionado aos contatos do novo usuário (ID: ${newUserId}).`);
-
-                     // Em um sistema real, aqui o backend também adicionaria o novo usuário
-                     // à lista de contatos do convidante. Nesta simulação, a lógica
-                     // em processUrlParams para usuários já logados fará essa "descoberta"
-                     // na próxima vez que a página do convidante carregar/atualizar.
 
                  } else {
                      console.warn(`Usuário convidante com ID ${invitingUserId} não encontrado na lista potencial durante o cadastro.`);
                  }
                  // Limpa o ID do convidante após processar
                  invitingUserIdOnLoad = null;
+                 console.log("inviteUserIdOnLoad limpo.");
             }
              // *** Fim da Lógica de Processamento do Convite no Cadastro ***
 
@@ -1375,14 +1620,16 @@
              allContacts = [...simulatedBackend.contacts]; // Atualiza a variável local para a lista do NOVO usuário
              filterAndRenderContacts();
 
-             // Opcional: Limpar os campos do formulário após o cadastro
+             // Limpa os campos do formulário após o cadastro bem-sucedido
              fullNameInputEl.value = '';
              nicknameInputEl.value = '';
              phoneInputEl.value = '';
              emailInputEl.value = '';
              registrationErrorMessageEl.style.display = 'none';
              registrationErrorMessageEl.textContent = '';
+             console.log("Cadastro concluído. Tela de chat mostrada.");
         }
+
 
         // Função para lidar com a seleção de arquivos
         function handleFileSelect(event) {
@@ -1459,9 +1706,6 @@
             }
         });
 
-        // Evento de input no campo de busca (para filtrar em tempo real)
-        searchContactInputEl.addEventListener('input', filterAndRenderContacts);
-
         // Evento de clique no botão de voltar (em mobile, na barra lateral)
         backButtonEl.addEventListener('click', showSidebar);
 
@@ -1508,9 +1752,27 @@
 
         // --- Inicialização ---
 
-        // Carrega o estado do localStorage e processa a URL ao carregar a página
-        // A função processUrlParams agora decide qual tela mostrar (cadastro ou chat)
-        processUrlParams();
+        // Adiciona um listener para garantir que o DOM esteja completamente carregado antes de iniciar
+        window.addEventListener('load', () => {
+            console.log("Janela carregada. Iniciando processUrlParams...");
+             // Adiciona um try...catch para capturar erros na inicialização
+            try {
+                processUrlParams();
+
+                // MOVIDO PARA DENTRO DO load event listener
+                // Evento de input no campo de busca (para filtrar em tempo real)
+                searchContactInputEl.addEventListener('input', filterAndRenderContacts);
+
+
+            } catch (e) {
+                console.error("Erro fatal durante a inicialização:", e);
+                 // Em caso de erro fatal, garante que a tela de autenticação seja mostrada
+                 showRegistrationScreen(); // Mostra a tela de cadastro
+                 registrationErrorMessageEl.textContent = "Ocorreu um erro inesperado. Por favor, tente novamente ou limpe o armazenamento local.";
+                 registrationErrorMessageEl.style.display = 'block';
+            }
+        });
+
 
     </script>
 </body>
